@@ -117,6 +117,20 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
 .toast{position:fixed;bottom:22px;right:22px;background:var(--tx);color:#fff;padding:11px 16px;border-radius:var(--r);font-size:12px;font-weight:500;z-index:999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .toast.success{background:#059669}.toast.error{background:#dc2626}
 
+/* GRIGLIA CALENDARIO */
+.cal-month-grid{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);background:var(--wc)}
+.cal-weekday{padding:10px 0;text-align:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:.04em}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day{min-height:100px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:6px;position:relative;vertical-align:top}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day.other-month{background:var(--sur2)}
+.cal-day.today{background:#fff9e6}
+.cal-day-num{font-size:11px;font-weight:600;color:var(--tx3);margin-bottom:4px}
+.cal-day.today .cal-day-num{color:var(--wc);font-weight:700}
+.cal-event-chip{border-radius:4px;padding:3px 6px;font-size:10px;font-weight:600;color:#fff;margin-bottom:2px;cursor:pointer;line-height:1.3;word-break:break-word;transition:opacity .15s}
+.cal-event-chip:hover{opacity:.85}
+.cal-event-multi{border-radius:4px;padding:3px 6px;font-size:10px;font-weight:600;color:#fff;margin-bottom:2px;cursor:pointer;line-height:1.3;font-style:italic}
 /* PRINT */
 @media print{
   .topbar,.toolbar,.tb-actions,.stats-row{display:none!important}
@@ -193,6 +207,9 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
       <button class="vt" id="vMesi" onclick="setView('mesi')">
         <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Per mese
       </button>
+      <button class="vt" id="vGriglia" onclick="setView('griglia')">
+        <svg viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="2"/><rect x="1" y="5" width="14" height="8"/><rect x="1" y="13" width="14" height="2"/><line x1="3" y1="1" x2="3" y2="15" stroke="currentColor"/><line x1="6" y1="1" x2="6" y2="15" stroke="currentColor"/><line x1="9" y1="1" x2="9" y2="15" stroke="currentColor"/><line x1="12" y1="1" x2="12" y2="15" stroke="currentColor"/></svg>Griglia
+      </button>
     </div>
   </div>
 
@@ -228,6 +245,26 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
   <!-- MESI VIEW -->
   <div id="viewMesi" style="display:none">
     <div class="cal-grid" id="mesiBody"></div>
+  </div>
+
+  <!-- GRIGLIA VIEW -->
+  <div id="viewGriglia" style="display:none">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <button class="btn" onclick="cambiaGrigliaAnno(-1)" style="padding:6px 12px">← Mese prec.</button>
+      <div style="flex:1;text-align:center;font-size:16px;font-weight:600;color:var(--tx)" id="grigliaTitle">—</div>
+      <button class="btn" onclick="cambiaGrigliaAnno(1)" style="padding:6px 12px">Mese succ. →</button>
+    </div>
+    <!-- Legenda -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:11px">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#26ADE4;display:inline-block"></span>Mammo + Eco</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#8b5cf6;display:inline-block"></span>Prostata</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#6366f1;display:inline-block"></span>Misto M+E/Prostata</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#10b981;display:inline-block"></span>Mappatura Nevi</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#f59e0b;display:inline-block"></span>Tiroide</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#ef4444;display:inline-block"></span>Cardiovascolare</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:#94a3b8;display:inline-block"></span>Altro/Aziendale</span>
+    </div>
+    <div id="grigliaBody"></div>
   </div>
 
 </div>
@@ -301,6 +338,7 @@ let editIdx = null;
 function init() {
   renderStats();
   renderIncaricatiFilter();
+  initGrigliaData();
   renderView();
 }
 
@@ -373,14 +411,17 @@ function setView(v) {
   currentView = v;
   document.getElementById('vLista').classList.toggle('on', v==='lista');
   document.getElementById('vMesi').classList.toggle('on', v==='mesi');
+  document.getElementById('vGriglia').classList.toggle('on', v==='griglia');
   document.getElementById('viewLista').style.display = v==='lista' ? '' : 'none';
   document.getElementById('viewMesi').style.display = v==='mesi' ? '' : 'none';
+  document.getElementById('viewGriglia').style.display = v==='griglia' ? '' : 'none';
   renderView();
 }
 
 function renderView() {
   if (currentView === 'lista') renderLista();
-  else renderMesi();
+  else if (currentView === 'mesi') renderMesi();
+  else renderGriglia();
 }
 
 function renderLista() {
@@ -521,6 +562,7 @@ function salvaEvento() {
   closeModal();
   renderStats();
   renderIncaricatiFilter();
+  initGrigliaData();
   renderView();
 }
 
@@ -625,6 +667,133 @@ function exportPDF() {
 
   doc.save(`WelfareCare_Calendario_2026${mese?'_'+mese:''}.pdf`);
   toast('PDF esportato','success');
+}
+
+// ── GRIGLIA CALENDARIO ────────────────────────────────
+const MESI_NOMI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MESI_IT = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+let grigliaData = new Date(2026, 0, 1); // Gennaio 2026 default
+
+function cambiaGrigliaAnno(dir) {
+  grigliaData.setMonth(grigliaData.getMonth() + dir);
+  renderGriglia();
+}
+
+function renderGriglia() {
+  const anno = grigliaData.getFullYear();
+  const mese = grigliaData.getMonth(); // 0-based
+  const meseNome = MESI_NOMI[mese];
+  const meseIt = MESI_IT[mese];
+  
+  document.getElementById('grigliaTitle').textContent = `${meseNome} ${anno}`;
+  
+  // Primo giorno del mese (0=Dom, 1=Lun...)
+  const primoGiorno = new Date(anno, mese, 1).getDay();
+  // Adatta a Lunedì come primo giorno (0=Lun...6=Dom)
+  const offset = primoGiorno === 0 ? 6 : primoGiorno - 1;
+  const giorniMese = new Date(anno, mese + 1, 0).getDate();
+  
+  // Eventi del mese
+  const evMese = eventi.filter(e => {
+    if (e.mese === meseIt) return true;
+    // Controlla anche per data esatta
+    if (e.data && e.data.length === 10) {
+      const d = new Date(e.data);
+      return d.getMonth() === mese && d.getFullYear() === anno;
+    }
+    return false;
+  });
+  
+  // Mappa giorno -> eventi
+  const evPerGiorno = {};
+  evMese.forEach(e => {
+    let giorno = null;
+    if (e.data && e.data.length === 10) {
+      const d = new Date(e.data);
+      if (d.getMonth() === mese && d.getFullYear() === anno) giorno = d.getDate();
+    }
+    if (giorno === null) {
+      // Evento senza data precisa — metti primo giorno libero o segnala
+      // Per eventi multi-giorno o senza data, li metti come "da pianificare"
+      if (!evPerGiorno[0]) evPerGiorno[0] = [];
+      evPerGiorno[0].push(e);
+      return;
+    }
+    if (!evPerGiorno[giorno]) evPerGiorno[giorno] = [];
+    evPerGiorno[giorno].push(e);
+  });
+
+  const oggi = new Date();
+  let html = `<div class="cal-month-grid">
+    <div class="cal-weekdays">
+      <div class="cal-weekday">LUN</div><div class="cal-weekday">MAR</div><div class="cal-weekday">MER</div>
+      <div class="cal-weekday">GIO</div><div class="cal-weekday">VEN</div>
+      <div class="cal-weekday" style="opacity:.7">SAB</div><div class="cal-weekday" style="opacity:.7">DOM</div>
+    </div>
+    <div class="cal-days">`;
+
+  // Celle mese precedente
+  const giorniMesePrec = new Date(anno, mese, 0).getDate();
+  for (let i = 0; i < offset; i++) {
+    const g = giorniMesePrec - offset + i + 1;
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${g}</div></div>`;
+  }
+
+  // Giorni del mese corrente
+  for (let g = 1; g <= giorniMese; g++) {
+    const isToday = g === oggi.getDate() && mese === oggi.getMonth() && anno === oggi.getFullYear();
+    const evG = evPerGiorno[g] || [];
+    const dayOfWeek = (offset + g - 1) % 7; // 0=Lun, 5=Sab, 6=Dom
+    const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+    
+    html += `<div class="cal-day${isToday?' today':''}${isWeekend?' other-month':''}">
+      <div class="cal-day-num">${g}</div>
+      ${evG.map(e => {
+        const idx = eventi.indexOf(e);
+        const bg = tipoColor(e.tipo);
+        const nome = e.comune.length > 30 ? e.comune.substring(0,28)+'…' : e.comune;
+        return `<div class="cal-event-chip" style="background:${bg}" onclick="openModalModifica(${idx})" title="${e.comune} — ${e.incaricato||''}">${nome}</div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Celle mese successivo
+  const totCelle = offset + giorniMese;
+  const rimanenti = totCelle % 7 === 0 ? 0 : 7 - (totCelle % 7);
+  for (let i = 1; i <= rimanenti; i++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  html += `</div></div>`;
+  
+  // Eventi senza data
+  const senzaData = evPerGiorno[0] || [];
+  if (senzaData.length > 0) {
+    html += `<div class="card" style="margin-top:14px">
+      <div class="ch"><span class="ct">⚠️ ${meseNome} — senza data precisa (${senzaData.length})</span></div>
+      <div style="padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap">
+        ${senzaData.map(e => {
+          const idx = eventi.indexOf(e);
+          return `<div class="cal-event-chip" style="background:${tipoColor(e.tipo)};display:inline-flex;cursor:pointer" onclick="openModalModifica(${idx})">${e.comune}</div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('grigliaBody').innerHTML = html;
+}
+
+// Inizializza griglia al mese corretto (primo mese con eventi)
+function initGrigliaData() {
+  // Cerca il primo mese del 2026 con eventi
+  const mesiOrdine = [0,1,2,3,4,5,6,7,8,9,10,11];
+  for (const m of mesiOrdine) {
+    const meseIt = MESI_IT[m];
+    if (eventi.some(e => e.mese === meseIt)) {
+      grigliaData = new Date(2026, m, 1);
+      return;
+    }
+  }
 }
 
 // ── UTILS ─────────────────────────────────────────────
