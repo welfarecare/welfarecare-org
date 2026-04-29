@@ -268,6 +268,10 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><path d="M1 14c0-3 2-5 5-5s5 2 5 5"/><path d="M11 7.5a2.5 2.5 0 1 0 0-5M15 14c0-2.5-1.5-4.5-4-5"/></svg>
         Utenti & Ruoli
       </div>
+      <div class="ni" data-s="mappa" onclick="navTo('mappa')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="7" r="2.5"/><path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/></svg>
+        Mappa
+      </div>
       <div class="ni" data-s="programma" onclick="navTo('programma')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h12v2H2zM2 7h8v2H2zM2 12h10v2H2z"/><path d="M12 9l2 2-2 2"/></svg>
         Programma
@@ -1235,6 +1239,7 @@ function navTo(id){
   if(id==='programma')loadProgramma();
   if(id==='archivio')loadArchivio();
   if(id==='utenti')loadUtenti();
+  if(id==='mappa')initMappa();
 }
 
 document.querySelectorAll('.mbg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
