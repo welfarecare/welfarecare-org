@@ -884,8 +884,6 @@ async function loadDash(){
   const piva=data.reduce((s,t)=>s+(t.numero_piva||0),0);
   document.getElementById('kTot').textContent=data.length;
   document.getElementById('kReg').textContent=regs.length;
-  document.getElementById('kPop').textContent=pop.toLocaleString('it-IT');
-  document.getElementById('kPiva').textContent=piva.toLocaleString('it-IT');
   document.getElementById('terrBadge').textContent=data.length;
   const tb=document.getElementById('dashTb');
   tb.innerHTML=data.slice(0,8).map(t=>`<tr onclick="apriScheda('${t.id}')"><td><strong>${t.comune}</strong></td><td>${t.provincia}</td><td>${t.regione}</td><td>${t.cap||'—'}</td><td>${t.profili?`${t.profili.nome||''} ${t.profili.cognome||''}`.trim():'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Nessun territorio</td></tr>';
