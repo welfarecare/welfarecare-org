@@ -92,6 +92,11 @@ body{font-family:var(--f);background:#0d1117;color:var(--tx);min-height:100vh;di
 .app-card.calendario:hover::before{opacity:1}
 .app-card.calendario .card-icon-bg{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
 
+/* Formazione — rosa/rosso */
+.app-card.formazione::before{background:linear-gradient(135deg,rgba(236,72,153,.06),rgba(190,24,93,.04))}
+.app-card.formazione:hover::before{opacity:1}
+.app-card.formazione .card-icon-bg{background:linear-gradient(135deg,#ec4899,#be185d)}
+
 .card-icon-bg{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
 .card-icon-bg svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:1.8}
 .card-name{font-size:16px;font-weight:600;color:var(--tx);margin-bottom:6px}
@@ -225,6 +230,15 @@ const TOOLS = [
     color: 'calendario',
     icon: `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>`,
     comingSoon: false
+  },
+  {
+    id: 'formazione',
+    name: 'Formazione',
+    desc: 'Accedi ai materiali formativi, corsi e risorse di aggiornamento per il personale WelfareCare.',
+    url: '/formazione/',
+    color: 'formazione',
+    icon: `<svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`,
+    comingSoon: true
   }
 ];
 
