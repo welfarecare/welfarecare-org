@@ -197,6 +197,25 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
 .sel-rm{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px}
 .sel-rm:hover{color:#a32d2d;background:#fcebeb}
 /* ARCHIVIO */
+.ass-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.ass-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.ass-head{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer}
+.ass-stato{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;flex-shrink:0}
+.ass-s-bozza{background:#f1f5f9;color:#64748b}
+.ass-s-confermata{background:var(--wcl);color:var(--wcd)}
+.ass-s-in_lavorazione{background:#fef3c7;color:#92400e}
+.ass-s-completata{background:#d1fae5;color:#065f46}
+.ass-comune{font-size:14px;font-weight:600;color:var(--tx)}
+.ass-meta{font-size:11px;color:var(--tx3);margin-top:3px}
+.ass-body{padding:14px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ass-field{display:flex;flex-direction:column;gap:3px}
+.ass-label{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.ass-value{font-size:12px;color:var(--tx)}
+.ass-foot{padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:center}
+.mod-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
+.mod-patrocinio{background:#e0e7ff;color:#3730a3}
+.mod-suolo_pubblico{background:#fef3c7;color:#92400e}
+.mod-location_privata{background:#d1fae5;color:#065f46}
 .arch-year-block{margin-bottom:18px}
 .arch-year-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;margin-bottom:4px}
 .arch-year-hdr:hover{background:#ebebeb}
@@ -271,6 +290,11 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
       <div class="ni" data-s="mappa" onclick="navTo('mappa')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="7" r="2.5"/><path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/></svg>
         Mappa
+      </div>
+      <div class="ni" data-s="assegnazioni" onclick="navTo('assegnazioni')">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><circle cx="13" cy="11" r="2.5"/><path d="M13 9.5v1.5l1 1"/></svg>
+        Assegnazioni
+        <span class="nib" id="assBadge">0</span>
       </div>
       <div class="ni" data-s="programma" onclick="navTo('programma')">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h12v2H2zM2 7h8v2H2zM2 12h10v2H2z"/><path d="M12 9l2 2-2 2"/></svg>
@@ -552,6 +576,31 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
           <div id="mapContainer" style="flex:1;border-radius:var(--rl);overflow:hidden;border:1px solid var(--bd)"></div>
         </div>
 
+        <!-- ASSEGNAZIONI -->
+        <div class="sec" id="s-assegnazioni">
+          <!-- Toolbar -->
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+            <select class="fs" id="assFilterAnno" onchange="loadAssegnazioni()" style="width:110px"></select>
+            <select class="fs" id="assFilterInc" onchange="loadAssegnazioni()" style="width:170px">
+              <option value="">Tutti gli incaricati</option>
+            </select>
+            <select class="fs" id="assFilterStato" onchange="loadAssegnazioni()" style="width:150px">
+              <option value="">Tutti gli stati</option>
+              <option value="bozza">Bozza</option>
+              <option value="confermata">Confermata</option>
+              <option value="in_lavorazione">In lavorazione</option>
+              <option value="completata">Completata</option>
+            </select>
+            <input class="fi" id="assSearch" placeholder="Cerca comune..." oninput="loadAssegnazioni()" style="width:180px;margin:0;font-size:12px"/>
+            <div style="flex:1"></div>
+            <button class="btn btnp" onclick="apriModalAssegnazione()">
+              <svg viewBox="0 0 16 16" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M8 2v12M2 8h12"/></svg>
+              Nuova assegnazione
+            </button>
+          </div>
+          <div id="assBody"><div class="loading">Caricamento...</div></div>
+        </div>
+
         <!-- ARCHIVIO -->
         <div class="sec" id="s-archivio">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
@@ -652,6 +701,104 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
           <div style="font-size:10px;color:var(--tx3);margin-top:4px" id="uploadLabel">Caricamento...</div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ASSEGNAZIONE -->
+<div class="mbg" id="mAssegnazione">
+  <div class="modal" style="width:720px">
+    <div class="mh">
+      <div class="mt" id="mAssTitle">Nuova assegnazione</div>
+      <button class="mc" onclick="closeM('mAssegnazione')">✕</button>
+    </div>
+    <div class="mb">
+      <!-- Comuni selezionati -->
+      <div class="slbl">Comuni da assegnare</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <select class="fs" id="assComuneSel" style="flex:1">
+          <option value="">Seleziona comune...</option>
+        </select>
+        <button class="btn btns" onclick="aggiungiComuneAss()">+ Aggiungi</button>
+      </div>
+      <div id="assComuniScelti" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;min-height:32px">
+        <div style="font-size:11px;color:var(--tx3);padding:6px 0">Nessun comune selezionato</div>
+      </div>
+
+      <div class="fgrid">
+        <!-- Incaricato & Anno -->
+        <div class="fg"><div class="fl">Incaricato *</div><select class="fs" id="assIncaricatoSel" style="width:100%"><option value="">Seleziona...</option></select></div>
+        <div class="fg"><div class="fl">Anno *</div><select class="fs" id="assAnnoSel" style="width:100%"></select></div>
+
+        <!-- Modalità -->
+        <div class="fg full">
+          <div class="fl">Modalità evento</div>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
+              <input type="radio" name="assModalita" value="patrocinio" checked style="accent-color:var(--wc)"/> 🏛️ Patrocinio comunale
+            </label>
+            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
+              <input type="radio" name="assModalita" value="suolo_pubblico" style="accent-color:var(--wc)"/> 🏙️ Suolo pubblico
+            </label>
+            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
+              <input type="radio" name="assModalita" value="location_privata" style="accent-color:var(--wc)"/> 🏢 Location privata
+            </label>
+          </div>
+        </div>
+        <div class="fg full"><div class="fl">Nome location (se privata)</div><input class="fi" id="assLocationNome" placeholder="Es. Centro Commerciale XYZ"/></div>
+
+        <!-- Date -->
+        <div class="fg"><div class="fl">Data patrocinio</div><input class="fi" id="assDataPatr" type="date"/></div>
+        <div class="fg"><div class="fl">Data evento prevista</div><input class="fi" id="assDataEvento" type="date"/></div>
+
+        <!-- Dettagli evento -->
+        <div class="fg"><div class="fl">Range d'età</div>
+          <select class="fs" id="assRangeEta" style="width:100%">
+            <option value="">— Seleziona —</option>
+            <option value="35-49">35-49</option>
+            <option value="35-45">35-45</option>
+            <option value="0-100 minori accomp.">0-100 (minori accompagnati)</option>
+            <option value="dai 40 anni">Dai 40 anni</option>
+            <option value="35-49 M+E / dai 40 per Prostata">35-49 M+E / dai 40 Prostata</option>
+            <option value="Aziendale">Aziendale</option>
+            <option value="da definire">Da definire</option>
+          </select>
+        </div>
+        <div class="fg"><div class="fl">Tipo evento</div>
+          <select class="fs" id="assTipoEvento" style="width:100%">
+            <option value="">— Seleziona —</option>
+            <option value="Mammo + Eco">Mammo + Eco</option>
+            <option value="M+E / Prostata">M+E / Prostata</option>
+            <option value="Prostata">Prostata</option>
+            <option value="Mappatura Nevi">Mappatura Nevi</option>
+            <option value="Tiroide">Tiroide</option>
+            <option value="Malattie Cardiovascolari">Malattie Cardiovascolari</option>
+            <option value="Misto">Misto</option>
+          </select>
+        </div>
+
+        <!-- Dicitura e inserire -->
+        <div class="fg full"><div class="fl">Dicitura del comune</div><input class="fi" id="assDicitura" placeholder="Es. Con il Patrocinio del Comune di..."/></div>
+        <div class="fg"><div class="fl">Inserire (logo/materiali)</div><input class="fi" id="assInserire" placeholder="Logo APS WelfareCare" value="Logo APS WelfareCare"/></div>
+        <div class="fg"><div class="fl">Partner sanitario</div><input class="fi" id="assPartner" placeholder="Es. RED CARE"/></div>
+
+        <!-- Stato -->
+        <div class="fg"><div class="fl">Stato</div>
+          <select class="fs" id="assStato" style="width:100%">
+            <option value="bozza">Bozza</option>
+            <option value="confermata">Confermata</option>
+            <option value="in_lavorazione">In lavorazione</option>
+            <option value="completata">Completata</option>
+          </select>
+        </div>
+
+        <!-- Note -->
+        <div class="fg full"><div class="fl">Note / Altro</div><textarea class="fi" id="assNote" rows="3" placeholder="Note operative, avvisi, istruzioni speciali..."></textarea></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btns" onclick="closeM('mAssegnazione')">Annulla</button>
+      <button class="btn btnp" onclick="salvaAssegnazione()" id="btnSalvaAss">Salva assegnazione</button>
     </div>
   </div>
 </div>
@@ -1228,7 +1375,7 @@ function closeM(id){document.getElementById(id).classList.remove('on');}
 function toggleMenu(){document.getElementById('uMenu').classList.toggle('on');}
 function handleSearch(q){if(document.getElementById('s-terr').classList.contains('on')){document.getElementById('tSearch').value=q;renderView();}}
 
-const NAV={dash:'Dashboard',terr:'Territori',mappa:'Mappa Territori',programma:'Programma di Sviluppo',archivio:'Archivio Edizioni',utenti:'Utenti & Ruoli',impost:'Impostazioni'};
+const NAV={dash:'Dashboard',terr:'Territori',mappa:'Mappa Territori',assegnazioni:'Assegnazioni',programma:'Programma di Sviluppo',archivio:'Archivio Edizioni',utenti:'Utenti & Ruoli',impost:'Impostazioni'};
 function navTo(id){
   document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on',n.dataset.s===id));
   document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on',s.id==='s-'+id));
@@ -1240,6 +1387,7 @@ function navTo(id){
   if(id==='archivio')loadArchivio();
   if(id==='utenti')loadUtenti();
   if(id==='mappa')initMappa();
+  if(id==='assegnazioni')loadAssegnazioni();
 }
 
 document.querySelectorAll('.mbg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
@@ -1669,6 +1817,258 @@ function addAnno() {
   sel.appendChild(opt);
   sel.value = curr + 1;
   loadProgramma();
+}
+
+// ─── ASSEGNAZIONI ─────────────────────────────────────
+let assEditId = null;
+let assComuniScelti = []; // [{id, comune, provincia}]
+
+function apriModalAssegnazione(editId = null) {
+  assEditId = editId;
+  assComuniScelti = [];
+  document.getElementById('mAssTitle').textContent = editId ? 'Modifica assegnazione' : 'Nuova assegnazione';
+  
+  // Popola selects
+  populateIncaricatiSelect('assIncaricatoSel');
+  populateAnniSelect('assAnnoSel');
+  
+  // Popola comuni
+  const sel = document.getElementById('assComuneSel');
+  sel.innerHTML = '<option value="">Seleziona comune...</option>';
+  [...allT].sort((a,b)=>a.comune.localeCompare(b.comune)).forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = `${t.comune} (${t.provincia})`;
+    sel.appendChild(o);
+  });
+
+  // Reset form
+  if (!editId) {
+    ['assDataPatr','assDataEvento','assLocationNome','assDicitura','assNote','assPartner'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('assInserire').value = 'Logo APS WelfareCare';
+    document.getElementById('assRangeEta').value = '';
+    document.getElementById('assTipoEvento').value = '';
+    document.getElementById('assStato').value = 'bozza';
+    document.querySelector('input[name="assModalita"][value="patrocinio"]').checked = true;
+    assComuniScelti = [];
+    renderAssComuniScelti();
+  }
+  
+  document.getElementById('mAssegnazione').classList.add('on');
+}
+
+function aggiungiComuneAss() {
+  const sel = document.getElementById('assComuneSel');
+  const id = sel.value;
+  if (!id) return;
+  if (assComuniScelti.find(c => c.id === id)) { toast('Comune già aggiunto', 'error'); return; }
+  const t = allT.find(x => x.id === id);
+  if (!t) return;
+  assComuniScelti.push({ id: t.id, comune: t.comune, provincia: t.provincia });
+  sel.value = '';
+  renderAssComuniScelti();
+  
+  // Auto-compila dicitura se vuota
+  const dic = document.getElementById('assDicitura');
+  if (!dic.value && assComuniScelti.length === 1) {
+    dic.value = `Con il Patrocinio del Comune di ${t.comune} (${t.provincia})`;
+  }
+}
+
+function renderAssComuniScelti() {
+  const div = document.getElementById('assComuniScelti');
+  if (!assComuniScelti.length) {
+    div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:6px 0">Nessun comune selezionato</div>';
+    return;
+  }
+  div.innerHTML = assComuniScelti.map(c => `
+    <span style="display:inline-flex;align-items:center;gap:5px;background:var(--wcl);color:var(--wcd);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500">
+      ${c.comune} (${c.provincia})
+      <button onclick="rimuoviComuneAss('${c.id}')" style="background:none;border:none;color:var(--wcd);cursor:pointer;font-size:12px;padding:0;line-height:1">✕</button>
+    </span>`).join('');
+}
+
+function rimuoviComuneAss(id) {
+  assComuniScelti = assComuniScelti.filter(c => c.id !== id);
+  renderAssComuniScelti();
+}
+
+async function salvaAssegnazione() {
+  if (!assComuniScelti.length) { toast('Seleziona almeno un comune', 'error'); return; }
+  const incId = document.getElementById('assIncaricatoSel').value;
+  const anno = parseInt(document.getElementById('assAnnoSel').value);
+  if (!incId) { toast('Seleziona un incaricato', 'error'); return; }
+  
+  const modalita = document.querySelector('input[name="assModalita"]:checked')?.value || 'patrocinio';
+  const btn = document.getElementById('btnSalvaAss');
+  btn.textContent = 'Salvo...'; btn.disabled = true;
+
+  const basePayload = {
+    incaricato_id: incId,
+    anno,
+    modalita,
+    location_nome: document.getElementById('assLocationNome').value.trim() || null,
+    data_patrocinio: document.getElementById('assDataPatr').value || null,
+    data_evento: document.getElementById('assDataEvento').value || null,
+    range_eta: document.getElementById('assRangeEta').value || null,
+    tipo_evento: document.getElementById('assTipoEvento').value || null,
+    dicitura_comune: document.getElementById('assDicitura').value.trim() || null,
+    inserire: document.getElementById('assInserire').value.trim() || null,
+    partner: document.getElementById('assPartner').value.trim() || null,
+    stato: document.getElementById('assStato').value,
+    note: document.getElementById('assNote').value.trim() || null,
+    creato_da: user?.id,
+  };
+
+  let errors = [];
+  for (const c of assComuniScelti) {
+    const payload = { ...basePayload, territorio_id: c.id };
+    const { error } = await sb.from('assegnazioni').insert(payload);
+    if (error) errors.push(c.comune);
+  }
+
+  btn.textContent = 'Salva assegnazione'; btn.disabled = false;
+  if (errors.length) { toast(`Errore su: ${errors.join(', ')}`, 'error'); return; }
+  
+  toast(`${assComuniScelti.length} assegnazion${assComuniScelti.length===1?'e':'i'} salvat${assComuniScelti.length===1?'a':'e'}`, 'success');
+  closeM('mAssegnazione');
+  await loadAssegnazioni();
+}
+
+async function loadAssegnazioni() {
+  // Popola filtri
+  const annSel = document.getElementById('assFilterAnno');
+  if (annSel.options.length < 2) populateAnniSelect('assFilterAnno', true);
+  populateIncaricatiSelect('assFilterInc');
+
+  const anno = document.getElementById('assFilterAnno').value;
+  const incId = document.getElementById('assFilterInc').value;
+  const stato = document.getElementById('assFilterStato').value;
+  const q = document.getElementById('assSearch').value.toLowerCase();
+
+  let query = sb.from('assegnazioni')
+    .select('*, territori(comune,provincia,regione,cap,note), profili(nome,cognome)')
+    .order('created_at', { ascending: false });
+  
+  if (anno) query = query.eq('anno', parseInt(anno));
+  if (incId) query = query.eq('incaricato_id', incId);
+  if (stato) query = query.eq('stato', stato);
+
+  const { data } = await query;
+  let filtered = (data || []);
+  if (q) filtered = filtered.filter(a => (a.territori?.comune||'').toLowerCase().includes(q) || (a.territori?.provincia||'').toLowerCase().includes(q));
+
+  document.getElementById('assBadge').textContent = filtered.length;
+
+  const body = document.getElementById('assBody');
+  if (!filtered.length) {
+    body.innerHTML = '<div class="empty">Nessuna assegnazione trovata.<br>Clicca "+ Nuova assegnazione" per iniziare.</div>';
+    return;
+  }
+
+  const modLabels = { patrocinio: '🏛️ Patrocinio', suolo_pubblico: '🏙️ Suolo pubblico', location_privata: '🏢 Location privata' };
+  const statoLabels = { bozza: 'Bozza', confermata: 'Confermata', in_lavorazione: 'In lavorazione', completata: 'Completata' };
+
+  body.innerHTML = filtered.map(a => {
+    const t = a.territori;
+    const inc = a.profili ? `${a.profili.nome||''} ${a.profili.cognome||''}`.trim() : '—';
+    const mod = a.modalita ? (modLabels[a.modalita] || a.modalita) : '—';
+    const locNome = a.location_nome ? ` — ${a.location_nome}` : '';
+    const statoLabel = statoLabels[a.stato] || a.stato;
+    
+    return `<div class="ass-card">
+      <div class="ass-head" onclick="toggleAssCard(this)">
+        <div style="flex:1">
+          <div class="ass-comune">${t?.comune||'—'} <span style="font-size:12px;color:var(--tx3);font-weight:400">(${t?.provincia||'—'})</span></div>
+          <div class="ass-meta">${a.anno} · ${inc} · ${mod}${locNome}</div>
+        </div>
+        <span class="ass-stato ass-s-${a.stato}">${statoLabel}</span>
+        <span style="color:var(--tx3);font-size:16px;margin-left:8px">›</span>
+      </div>
+      <div class="ass-body" style="display:none">
+        <div class="ass-field"><div class="ass-label">Tipo evento</div><div class="ass-value">${a.tipo_evento||'—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Range d'età</div><div class="ass-value">${a.range_eta||'—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Data patrocinio</div><div class="ass-value">${a.data_patrocinio ? new Date(a.data_patrocinio).toLocaleDateString('it-IT') : '—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Data evento</div><div class="ass-value">${a.data_evento ? new Date(a.data_evento).toLocaleDateString('it-IT') : '—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Dicitura comune</div><div class="ass-value">${a.dicitura_comune||'—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Inserire</div><div class="ass-value">${a.inserire||'—'}</div></div>
+        <div class="ass-field"><div class="ass-label">Partner</div><div class="ass-value">${a.partner||'—'}</div></div>
+        ${a.note ? `<div class="ass-field" style="grid-column:1/-1"><div class="ass-label">Note</div><div class="ass-value" style="color:var(--tx2)">${a.note}</div></div>` : ''}
+        ${t?.note ? `<div class="ass-field" style="grid-column:1/-1"><div class="ass-label">Stato territorio</div><div class="ass-value"><span class="bx bk" style="font-size:10px">${t.note.replace('Stato: ','')}</span></div></div>` : ''}
+      </div>
+      <div class="ass-foot" style="display:none">
+        <span class="mod-badge mod-${a.modalita||'patrocinio'}">${mod}</span>
+        <div style="flex:1"></div>
+        <button class="btn btns" style="font-size:10px;padding:3px 8px" onclick="cambiaStatoAss('${a.id}','${a.stato}')">Cambia stato</button>
+        <button class="btn btns" style="font-size:10px;padding:3px 8px" onclick="apriStorico('${a.territorio_id}')">📋 Storico</button>
+        <button class="btn btns" style="font-size:10px;padding:3px 8px;color:#a32d2d" onclick="eliminaAss('${a.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAssCard(head) {
+  const body = head.nextElementSibling;
+  const foot = body.nextElementSibling;
+  const arrow = head.querySelector('span:last-child');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'grid';
+  foot.style.display = open ? 'none' : 'flex';
+  arrow.textContent = open ? '›' : '⌄';
+}
+
+async function cambiaStatoAss(id, statoAttuale) {
+  const stati = ['bozza','confermata','in_lavorazione','completata'];
+  const labels = { bozza:'Bozza', confermata:'Confermata', in_lavorazione:'In lavorazione', completata:'Completata' };
+  const idx = stati.indexOf(statoAttuale);
+  const prossimo = stati[(idx + 1) % stati.length];
+  if (!confirm(`Cambiare stato a "${labels[prossimo]}"?`)) return;
+  await sb.from('assegnazioni').update({ stato: prossimo }).eq('id', id);
+  toast(`Stato aggiornato: ${labels[prossimo]}`, 'success');
+  await loadAssegnazioni();
+}
+
+async function eliminaAss(id) {
+  if (!confirm('Eliminare questa assegnazione?')) return;
+  await sb.from('assegnazioni').delete().eq('id', id);
+  toast('Assegnazione eliminata', 'success');
+  await loadAssegnazioni();
+}
+
+async function apriStorico(territorioId) {
+  // Apre la scheda del territorio con tutto lo storico
+  const t = allT.find(x => x.id === territorioId);
+  if (!t) return;
+  
+  // Carica storico assegnazioni per questo territorio
+  const { data } = await sb.from('assegnazioni')
+    .select('*, profili(nome,cognome)')
+    .eq('territorio_id', territorioId)
+    .order('anno', { ascending: false });
+  
+  closeM('mAssegnazione');
+  
+  // Apri scheda territorio normale + mostra storico assegnazioni
+  await apriScheda(territorioId);
+  
+  // Aggiungi storico assegnazioni nella scheda
+  const schedaBudget = document.getElementById('schedaBudget').parentElement;
+  const storicoDiv = document.getElementById('schedaStoricoAss') || document.createElement('div');
+  storicoDiv.id = 'schedaStoricoAss';
+  storicoDiv.style.cssText = 'padding:14px 16px;border-top:1px solid var(--bd)';
+  storicoDiv.innerHTML = `
+    <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Storico assegnazioni</div>
+    ${!data?.length ? '<div class="empty" style="padding:12px;font-size:11px">Nessuna assegnazione passata</div>' :
+    data.map(a => {
+      const inc = a.profili ? `${a.profili.nome||''} ${a.profili.cognome||''}`.trim() : '—';
+      const labels = { bozza:'Bozza', confermata:'Confermata', in_lavorazione:'In lavorazione', completata:'Completata' };
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px">
+        <span style="font-weight:600;color:var(--tx);min-width:40px">${a.anno}</span>
+        <span style="flex:1;color:var(--tx2)">${a.tipo_evento||'—'} · ${inc}</span>
+        <span class="ass-stato ass-s-${a.stato}" style="font-size:10px">${labels[a.stato]||a.stato}</span>
+      </div>`;
+    }).join('')}
+  `;
+  schedaBudget.parentElement.appendChild(storicoDiv);
 }
 
 // ─── ARCHIVIO ─────────────────────────────────────────
