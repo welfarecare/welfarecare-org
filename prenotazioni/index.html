@@ -179,10 +179,21 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
         <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
         Dashboard
       </div>
-      <div class="ni" data-s="eventi" onclick="navTo('eventi')">
-        <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M2 6h12M6 2v4M10 2v4"/></svg>
-        Eventi
-        <span class="nib" id="evBadge">0</span>
+      <div class="snl" style="margin-top:6px">Categorie</div>
+      <div class="ni" data-s="pubblico" onclick="navTo('pubblico')">
+        <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M1 14c0-4 3-6 7-6s7 2 7 6"/></svg>
+        Ev. Pubblici
+        <span class="nib" id="evPubBadge">0</span>
+      </div>
+      <div class="ni" data-s="aziendale" onclick="navTo('aziendale')">
+        <svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="10" rx="1"/><path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M8 9v2M6 9v2M10 9v2"/></svg>
+        Ev. Aziendali
+        <span class="nib" id="evAzBadge">0</span>
+      </div>
+      <div class="ni" data-s="prelievo" onclick="navTo('prelievo')">
+        <svg viewBox="0 0 16 16"><path d="M8 2v8M5 7l3 3 3-3"/><rect x="3" y="12" width="10" height="2" rx="1"/></svg>
+        Prelievi
+        <span class="nib" id="evPreBadge">0</span>
       </div>
       <div class="ni" data-s="prenotazioni" onclick="navTo('prenotazioni')">
         <svg viewBox="0 0 16 16"><circle cx="6" cy="5" r="2.5"/><path d="M1 14c0-3 2-5 5-5s5 2 5 5"/><path d="M11 7.5a2.5 2.5 0 1 0 0-5M15 14c0-2.5-1.5-4.5-4-5"/></svg>
@@ -237,9 +248,19 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
           </div>
         </div>
 
-        <!-- EVENTI -->
-        <div class="sec" id="s-eventi">
-          <div id="eventiList"><div class="loading">Caricamento...</div></div>
+        <!-- EVENTI PUBBLICI -->
+        <div class="sec" id="s-pubblico">
+          <div id="listPubblico"><div class="loading">Caricamento...</div></div>
+        </div>
+
+        <!-- EVENTI AZIENDALI -->
+        <div class="sec" id="s-aziendale">
+          <div id="listAziendale"><div class="loading">Caricamento...</div></div>
+        </div>
+
+        <!-- PRELIEVI -->
+        <div class="sec" id="s-prelievo">
+          <div id="listPrelievo"><div class="loading">Caricamento...</div></div>
         </div>
 
         <!-- PRENOTAZIONI -->
@@ -365,7 +386,24 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;
         <div class="fg"><div class="fl">URL foto</div><input class="fi" id="eFoto" placeholder="https://..."/></div>
         <div class="fg full"><div class="fl">Note interne</div><textarea class="fi" id="eNote" rows="2" placeholder="Note visibili solo agli admin..."></textarea></div>
       </div>
-      <div class="sep">Impostazioni</div>
+      <div class="sep">Categoria & Impostazioni</div>
+      <div class="fg" style="margin-bottom:14px">
+        <div class="fl">Categoria *</div>
+        <div style="display:flex;gap:8px">
+          <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);transition:all .15s" id="catPubLabel">
+            <input type="radio" name="eCategoria" id="eCatPub" value="pubblico" checked style="accent-color:var(--wc)"/> 
+            <span>👥 Pubblico</span>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);transition:all .15s" id="catAzLabel">
+            <input type="radio" name="eCategoria" id="eCatAz" value="aziendale" style="accent-color:var(--wc)"/> 
+            <span>🏢 Aziendale</span>
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);transition:all .15s" id="catPreLabel">
+            <input type="radio" name="eCategoria" id="eCatPre" value="prelievo" style="accent-color:var(--wc)"/> 
+            <span>🩸 Prelievo</span>
+          </label>
+        </div>
+      </div>
       <div style="display:flex;gap:12px">
         <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px">
           <input type="checkbox" id="eAttivo" checked style="accent-color:var(--wc);width:14px;height:14px"/> Evento attivo
@@ -505,8 +543,12 @@ async function loadTipologie(){
 async function loadEventi(){
   const{data}=await sb.from('eventi_prenotazioni').select('*, tipologie_evento(nome,colore)').order('data');
   allEventi=data||[];
-  document.getElementById('evBadge').textContent=allEventi.filter(e=>e.attivo).length;
-  renderEventi();
+  document.getElementById('evPubBadge').textContent=allEventi.filter(e=>e.categoria==='pubblico'||!e.categoria).length;
+  document.getElementById('evAzBadge').textContent=allEventi.filter(e=>e.categoria==='aziendale').length;
+  document.getElementById('evPreBadge').textContent=allEventi.filter(e=>e.categoria==='prelievo').length;
+  renderEventiCategoria('pubblico');
+  renderEventiCategoria('aziendale');
+  renderEventiCategoria('prelievo');
 }
 
 function populateEventiSelects(){
@@ -546,11 +588,19 @@ async function loadDashboard(){
 }
 
 // ── EVENTI ───────────────────────────────────────────
-function renderEventi(){
-  const div=document.getElementById('eventiList');
-  if(!allEventi.length){div.innerHTML='<div class="empty">Nessun evento. Crea il primo!</div>';return;}
-  div.innerHTML=allEventi.map(e=>{
+function renderEventiCategoria(cat){
+  const divId = cat==='pubblico'?'listPubblico':cat==='aziendale'?'listAziendale':'listPrelievo';
+  const div = document.getElementById(divId);
+  if(!div) return;
+  const lista = allEventi.filter(e => cat==='pubblico' ? (e.categoria==='pubblico'||!e.categoria) : e.categoria===cat);
+  if(!lista.length){
+    const labels={'pubblico':'pubblici','aziendale':'aziendali','prelievo':'prelievi'};
+    div.innerHTML=`<div class="empty">Nessun evento ${labels[cat]}. Crea il primo!</div>`;
+    return;
+  }
+  div.innerHTML=lista.map(e=>{
     const col=e.tipologie_evento?.colore||'#26ADE4';
+    const catBadge={'pubblico':'👥 Pubblico','aziendale':'🏢 Aziendale','prelievo':'🩸 Prelievo'}[e.categoria||'pubblico'];
     return`<div class="ev-card">
       <div class="ev-card-head">
         <div class="ev-dot" style="background:${col}"></div>
@@ -558,8 +608,9 @@ function renderEventi(){
           <div class="ev-title">${e.titolo}</div>
           <div class="ev-meta">${e.data} · ${e.location||'—'} · ${e.tipologie_evento?.nome||'—'}</div>
         </div>
-        <span class="bx ${e.attivo?'bg':'bk'}">${e.attivo?'Attivo':'Inattivo'}</span>
-        <span class="bx ${e.prenotazioni_aperte?'bb':'ba'}" style="margin-left:4px">${e.prenotazioni_aperte?'Prenotazioni aperte':'Prenotazioni chiuse'}</span>
+        <span class="bx bk" style="font-size:10px">${catBadge}</span>
+        <span class="bx ${e.attivo?'bg':'bk'}" style="margin-left:4px">${e.attivo?'Attivo':'Inattivo'}</span>
+        <span class="bx ${e.prenotazioni_aperte?'bb':'ba'}" style="margin-left:4px">${e.prenotazioni_aperte?'Aperte':'Chiuse'}</span>
       </div>
       <div class="ev-foot">
         <button class="btn btns" onclick="apriSlot('${e.id}')">
@@ -580,6 +631,7 @@ async function salvaEvento(){
   const titolo=document.getElementById('eTitle').value.trim();
   const data=document.getElementById('eData').value;
   if(!titolo||!data){toast('Titolo e data obbligatori','error');return;}
+  const catSel=document.querySelector('input[name="eCategoria"]:checked');
   const payload={
     titolo,data,
     orario_inizio:document.getElementById('eOrarioI').value,
@@ -597,6 +649,7 @@ async function salvaEvento(){
     attivo:document.getElementById('eAttivo').checked,
     prenotazioni_aperte:document.getElementById('eAperto').checked,
     tipologia_id:document.getElementById('eTipologia').value||null,
+    categoria:catSel?catSel.value:'pubblico',
   };
   if(editId){await sb.from('eventi_prenotazioni').update(payload).eq('id',editId);}
   else{await sb.from('eventi_prenotazioni').insert(payload);}
@@ -605,6 +658,9 @@ async function salvaEvento(){
   await loadEventi();
   populateEventiSelects();
   loadDashboard();
+  // Torna alla sezione categoria giusta
+  const catSaved=document.querySelector('input[name="eCategoria"]:checked')?.value||'pubblico';
+  navTo(catSaved);
 }
 
 function editEvento(id){
@@ -628,6 +684,9 @@ function editEvento(id){
   document.getElementById('eAttivo').checked=e.attivo;
   document.getElementById('eAperto').checked=e.prenotazioni_aperte;
   document.getElementById('eTipologia').value=e.tipologia_id||'';
+  const cat=e.categoria||'pubblico';
+  const radio=document.querySelector(`input[name="eCategoria"][value="${cat}"]`);
+  if(radio)radio.checked=true;
   document.getElementById('mEvento').classList.add('on');
 }
 
@@ -851,8 +910,8 @@ async function deleteTemplate(id){
 }
 
 // ── NAVIGATION ───────────────────────────────────────
-const NAV={dashboard:'Dashboard',eventi:'Eventi',prenotazioni:'Prenotazioni',tipologie:'Tipologie',slot:'Slot orari',documenti:'Documenti',template:'Template email'};
-const NAV_NEW={eventi:'Nuovo evento',tipologie:'Nuova tipologia',slot:'Nuovo slot',documenti:'Nuovo documento',template:'Nuovo template'};
+const NAV={dashboard:'Dashboard',pubblico:'Ev. Pubblici',aziendale:'Ev. Aziendali',prelievo:'Prelievi',prenotazioni:'Prenotazioni',tipologie:'Tipologie',slot:'Slot orari',documenti:'Documenti',template:'Template email'};
+const NAV_NEW={pubblico:'Nuovo evento pubblico',aziendale:'Nuovo evento aziendale',prelievo:'Nuovo prelievo',tipologie:'Nuova tipologia',slot:'Nuovo slot',documenti:'Nuovo documento',template:'Nuovo template'};
 
 function navTo(id){
   document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on',n.dataset.s===id));
@@ -870,7 +929,19 @@ function navTo(id){
 function openNew(){
   editId=null;
   const sec=document.querySelector('.sec.on').id.replace('s-','');
-  if(sec==='eventi'){document.getElementById('mEventoTitle').textContent='Nuovo evento';['eTitle','eIndirizzo','eCitta','eProv','eDesc','eReq','ePartner','eFoto','eNote','eLocation'].forEach(id=>document.getElementById(id).value='');document.getElementById('eData').value='';document.getElementById('eSlot').value=45;document.getElementById('eAttivo').checked=true;document.getElementById('eAperto').checked=true;document.getElementById('eTipologia').value='';document.getElementById('mEvento').classList.add('on');}
+  if(['pubblico','aziendale','prelievo'].includes(sec)){
+    const labels={pubblico:'Nuovo evento pubblico',aziendale:'Nuovo evento aziendale',prelievo:'Nuovo prelievo'};
+    document.getElementById('mEventoTitle').textContent=labels[sec]||'Nuovo evento';
+    ['eTitle','eIndirizzo','eCitta','eProv','eDesc','eReq','ePartner','eFoto','eNote','eLocation'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('eData').value='';
+    document.getElementById('eSlot').value=45;
+    document.getElementById('eAttivo').checked=true;
+    document.getElementById('eAperto').checked=true;
+    document.getElementById('eTipologia').value='';
+    const radio=document.querySelector(`input[name="eCategoria"][value="${sec==='prelievo'?'prelievo':sec}"]`);
+    if(radio)radio.checked=true;
+    document.getElementById('mEvento').classList.add('on');
+  }
   else if(sec==='tipologie'){document.getElementById('mTipTitle').textContent='Nuova tipologia';['tNome'].forEach(id=>document.getElementById(id).value='');document.getElementById('tEtaMin').value=18;document.getElementById('tEtaMax').value=99;document.getElementById('tDurata').value=10;document.getElementById('tColore').value='#26ADE4';document.getElementById('mTipologia').classList.add('on');}
   else if(sec==='slot'){document.getElementById('sOraI').value='';document.getElementById('sOraF').value='';document.getElementById('sPosti').value=1;document.getElementById('mSlot').classList.add('on');}
   else if(sec==='documenti'){['dTitolo','dUrl'].forEach(id=>document.getElementById(id).value='');document.getElementById('mDocumento').classList.add('on');}
