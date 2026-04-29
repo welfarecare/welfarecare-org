@@ -70,7 +70,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
 .ct{flex:1;overflow-y:auto;padding:22px}
 .sec{display:none}.sec.on{display:block}
 /* KPIS */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
 .kpi{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px}
 .kl{font-size:11px;color:var(--tx2);font-weight:500;margin-bottom:4px}
 .kv{font-size:24px;font-weight:600;color:var(--tx);line-height:1}
@@ -300,8 +300,6 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
           <div class="kpis">
             <div class="kpi"><div class="kl">Territori totali</div><div class="kv" id="kTot">—</div><div class="ks"><span class="kdot"></span>comuni</div></div>
             <div class="kpi"><div class="kl">Regioni coperte</div><div class="kv" id="kReg" style="color:var(--wc)">—</div><div class="ks">regioni</div></div>
-            <div class="kpi"><div class="kl">Popolazione</div><div class="kv" id="kPop" style="font-size:16px">—</div><div class="ks">abitanti totali</div></div>
-            <div class="kpi"><div class="kl">P.IVA totali</div><div class="kv" id="kPiva" style="color:#3b6d11">—</div><div class="ks">registrate</div></div>
           </div>
           <div class="card">
             <div class="ch"><span class="ct2">Ultimi territori aggiunti</span><button class="btn btns" onclick="navTo('terr')">Vedi tutti →</button></div>
