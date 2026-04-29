@@ -1330,21 +1330,123 @@ async function loadStoricoEdizioni(territorioId) {
     const statoLbl = item ? (statoLabels[item.stato] || item.stato) : null;
     const statoCls = item ? (statoColors[item.stato] || 'bk') : null;
 
-    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)">
-      <div style="width:40px;font-weight:700;font-size:13px;color:var(--tx);flex-shrink:0">${anno}</div>
-      <div style="flex:1;min-width:0">
-        ${item ? `
-          <div style="font-size:12px;font-weight:500;color:var(--tx)">${item.tipo}${item.inc !== '—' ? ` · <span style="color:var(--tx3)">${item.inc}</span>` : ''}</div>
-          ${item.data_evento ? `<div style="font-size:10px;color:var(--tx3);margin-top:2px">📅 ${new Date(item.data_evento).toLocaleDateString('it-IT')}</div>` : ''}
-          ${item.note ? `<div style="font-size:11px;color:var(--tx2);margin-top:3px;font-style:italic">${item.note}</div>` : ''}
-        ` : '<div style="font-size:11px;color:var(--tx3)">Solo budget registrato</div>'}
+    return `<div style="border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden">
+      <!-- Header anno -->
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--sur2);cursor:pointer" onclick="toggleStoricoAnno(this)">
+        <div style="width:40px;font-weight:700;font-size:13px;color:var(--tx);flex-shrink:0">${anno}</div>
+        <div style="flex:1;min-width:0">
+          ${item ? `
+            <div style="font-size:12px;font-weight:500;color:var(--tx)">${item.tipo}${item.inc !== '—' ? ` · <span style="color:var(--tx3);font-weight:400">${item.inc}</span>` : ''}</div>
+            ${item.data_evento ? `<span style="font-size:10px;color:var(--tx3)">📅 ${new Date(item.data_evento).toLocaleDateString('it-IT')}</span>` : ''}
+          ` : '<span style="font-size:11px;color:var(--tx3)">Solo budget registrato</span>'}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          ${statoLbl ? `<span class="bx ${statoCls}" style="font-size:10px">${statoLbl}</span>` : ''}
+          ${budget ? `<span style="font-size:11px;font-weight:600;color:var(--wcd)">€ ${Number(budget).toLocaleString('it-IT')}</span>` : ''}
+          <span style="color:var(--tx3);font-size:14px;margin-left:4px">›</span>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-        ${statoLbl ? `<span class="bx ${statoCls}" style="font-size:10px">${statoLbl}</span>` : ''}
-        ${budget ? `<span style="font-size:11px;font-weight:600;color:var(--wcd)">€ ${Number(budget).toLocaleString('it-IT')}</span>` : ''}
+      <!-- Body anno (collassato) -->
+      <div style="display:none;padding:12px 14px">
+        ${item?.note ? `<div style="font-size:11px;color:var(--tx2);margin-bottom:10px;font-style:italic">📝 ${item.note}</div>` : ''}
+        <!-- Documenti edizione -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em">Documenti edizione ${anno}</div>
+          <label style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:4px 9px;border:1px solid var(--bd2);border-radius:6px;cursor:pointer;background:var(--sur)">
+            <svg viewBox="0 0 16 16" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M3 12h10"/></svg>
+            Carica
+            <input type="file" style="display:none" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif" onchange="uploadDocumentoEdizione(this,'${territorioId}',${anno})"/>
+          </label>
+        </div>
+        <div id="docs-${territorioId}-${anno}" style="min-height:28px">
+          <div style="font-size:11px;color:var(--tx3)">Caricamento...</div>
+        </div>
       </div>
     </div>`;
   }).join('') + '<div style="height:4px"></div>';
+}
+
+// ── STORICO ANNO TOGGLE & UPLOAD ─────────────────────
+function toggleStoricoAnno(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('span:last-child');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.textContent = isOpen ? '›' : '⌄';
+  // Carica documenti se si apre per la prima volta
+  if (!isOpen) {
+    const input = body.querySelector('input[type="file"]');
+    if (input) {
+      const onchange = input.getAttribute('onchange');
+      const match = onchange?.match(/uploadDocumentoEdizione\(this,'([^']+)',(\d+)\)/);
+      if (match) loadDocumentiEdizione(match[1], parseInt(match[2]));
+    }
+  }
+}
+
+async function loadDocumentiEdizione(territorioId, anno) {
+  const div = document.getElementById(`docs-${territorioId}-${anno}`);
+  if (!div) return;
+  
+  const { data } = await sb.from('documenti_territorio')
+    .select('*')
+    .eq('territorio_id', territorioId)
+    .eq('anno', anno)
+    .order('created_at', { ascending: false });
+
+  if (!data?.length) {
+    div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:4px 0">Nessun documento per questa edizione</div>';
+    return;
+  }
+
+  div.innerHTML = data.map(d => {
+    const ext = (d.nome||'').split('.').pop().toLowerCase();
+    const icon = ext==='pdf'?'📄':['xls','xlsx'].includes(ext)?'📊':['doc','docx'].includes(ext)?'📝':['jpg','jpeg','png','gif'].includes(ext)?'🖼️':'📎';
+    const size = d.dimensione?(d.dimensione>1024*1024?(d.dimensione/1024/1024).toFixed(1)+' MB':Math.round(d.dimensione/1024)+' KB'):'';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:15px">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.nome}</div>
+        <div style="font-size:10px;color:var(--tx3)">${size} · ${new Date(d.created_at).toLocaleDateString('it-IT')}</div>
+      </div>
+      <button onclick="apriDocumento('${d.storage_path}')" style="padding:3px 8px;font-size:10px;border:1px solid var(--bd2);border-radius:5px;color:var(--wc);background:none;cursor:pointer;font-family:var(--f)">Apri</button>
+      <button onclick="eliminaDocumentoEdizione('${d.id}','${d.storage_path}','${territorioId}',${anno})" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:13px;padding:1px 4px">✕</button>
+    </div>`;
+  }).join('') + '<div style="height:2px"></div>';
+}
+
+async function uploadDocumentoEdizione(input, territorioId, anno) {
+  if (!input.files?.length) return;
+  const files = [...input.files];
+  
+  for (const file of files) {
+    const path = `${territorioId}/${anno}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const { error: upErr } = await sb.storage.from('documenti-territori').upload(path, file, { upsert: false });
+    if (upErr) { toast(`Errore: ${file.name}`, 'error'); continue; }
+    await sb.from('documenti_territorio').insert({
+      territorio_id: territorioId,
+      nome: file.name,
+      tipo: file.type,
+      dimensione: file.size,
+      storage_path: path,
+      url_pubblico: null,
+      anno: anno,
+      categoria: 'edizione',
+      caricato_da: (await sb.auth.getUser()).data.user?.id || null,
+    });
+  }
+  
+  input.value = '';
+  toast(`${files.length} file caricati`, 'success');
+  await loadDocumentiEdizione(territorioId, anno);
+}
+
+async function eliminaDocumentoEdizione(id, path, territorioId, anno) {
+  if (!confirm('Eliminare questo documento?')) return;
+  await sb.storage.from('documenti-territori').remove([path]);
+  await sb.from('documenti_territorio').delete().eq('id', id);
+  toast('Eliminato', 'success');
+  await loadDocumentiEdizione(territorioId, anno);
 }
 
 // ── DOCUMENTI TERRITORIO ────────────────────────────
