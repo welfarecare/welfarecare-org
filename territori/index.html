@@ -690,11 +690,46 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
           <div style="font-size:10px;color:var(--tx3);margin-top:4px" id="uploadLabel">Caricamento...</div>
         </div>
       </div>
+      <!-- REFERENTI -->
+      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Referenti & Contatti</div>
+          <button onclick="apriModalReferente()" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:4px 9px;border:1px solid var(--bd2);border-radius:6px;cursor:pointer;background:var(--sur);font-family:var(--f)">
+            <svg viewBox="0 0 16 16" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M8 2v12M2 8h12"/></svg>
+            Aggiungi referente
+          </button>
+        </div>
+        <div id="schedaReferenti"><div class="empty" style="padding:12px;font-size:11px">Nessun referente registrato</div></div>
+      </div>
       <!-- STORICO EDIZIONI -->
       <div style="padding:14px 16px;border-top:1px solid var(--bd)">
         <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Storico edizioni</div>
         <div id="schedaStorico"><div class="empty" style="padding:12px;font-size:11px">Nessuna edizione registrata</div></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REFERENTE -->
+<div class="mbg" id="mReferente">
+  <div class="modal" style="width:480px">
+    <div class="mh">
+      <div class="mt" id="mRefTitle">Nuovo referente</div>
+      <button class="mc" onclick="closeM('mReferente')">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fgrid">
+        <div class="fg full"><div class="fl">Nome *</div><input class="fi" id="refNome" placeholder="Es. Mario Rossi"/></div>
+        <div class="fg"><div class="fl">Ruolo</div><input class="fi" id="refRuolo" placeholder="Es. Assessore, Segreteria..."/></div>
+        <div class="fg"><div class="fl">Data ultimo contatto</div><input class="fi" id="refDataContatto" type="date"/></div>
+        <div class="fg"><div class="fl">Telefono</div><input class="fi" id="refTel" type="tel" placeholder="+39 340 1234567"/></div>
+        <div class="fg"><div class="fl">Email</div><input class="fi" id="refEmail" type="email" placeholder="mario.rossi@comune.it"/></div>
+        <div class="fg full"><div class="fl">Note</div><textarea class="fi" id="refNote" rows="3" placeholder="Note sul referente, come contattarlo, orari..."></textarea></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btns" onclick="closeM('mReferente')">Annulla</button>
+      <button class="btn btnp" onclick="salvaReferente()">Salva referente</button>
     </div>
   </div>
 </div>
@@ -1155,6 +1190,8 @@ async function apriScheda(id){
     const mx=Math.max(...budget.map(b=>b.importo||0));
     bd.innerHTML=budget.map(b=>`<div class="brow"><span class="banno">${b.anno}</span><div class="bbar"><div class="bfill" style="width:${mx>0?Math.round((b.importo/mx)*100):0}%"></div></div><span class="bimp">€ ${Number(b.importo).toLocaleString('it-IT')}</span></div>`).join('');
   }
+  // Carica referenti
+  await loadReferenti(id);
   // Carica documenti
   await loadDocumentiTerritorio(id);
   // Carica storico edizioni
@@ -1364,6 +1401,103 @@ async function loadStoricoEdizioni(territorioId) {
       </div>
     </div>`;
   }).join('') + '<div style="height:4px"></div>';
+}
+
+// ── REFERENTI TERRITORIO ─────────────────────────────
+let refEditId = null;
+let refTerritoryId = null;
+
+function apriModalReferente(editId = null) {
+  refEditId = editId;
+  document.getElementById('mRefTitle').textContent = editId ? 'Modifica referente' : 'Nuovo referente';
+  if (!editId) {
+    ['refNome','refRuolo','refTel','refEmail','refNote','refDataContatto'].forEach(id => document.getElementById(id).value = '');
+  }
+  document.getElementById('mReferente').classList.add('on');
+}
+
+async function salvaReferente() {
+  const nome = document.getElementById('refNome').value.trim();
+  if (!nome) { toast('Il nome è obbligatorio', 'error'); return; }
+  if (!refTerritoryId) return;
+
+  const payload = {
+    territorio_id: refTerritoryId,
+    nome,
+    ruolo: document.getElementById('refRuolo').value.trim() || null,
+    telefono: document.getElementById('refTel').value.trim() || null,
+    email: document.getElementById('refEmail').value.trim() || null,
+    note: document.getElementById('refNote').value.trim() || null,
+    data_ultimo_contatto: document.getElementById('refDataContatto').value || null,
+  };
+
+  if (refEditId) {
+    await sb.from('referenti_territorio').update(payload).eq('id', refEditId);
+  } else {
+    await sb.from('referenti_territorio').insert(payload);
+  }
+
+  toast(refEditId ? 'Referente aggiornato' : 'Referente aggiunto', 'success');
+  closeM('mReferente');
+  await loadReferenti(refTerritoryId);
+}
+
+async function loadReferenti(territorioId) {
+  refTerritoryId = territorioId;
+  const div = document.getElementById('schedaReferenti');
+  div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:6px 0">Caricamento...</div>';
+
+  const { data } = await sb.from('referenti_territorio')
+    .select('*')
+    .eq('territorio_id', territorioId)
+    .order('created_at', { ascending: false });
+
+  if (!data?.length) {
+    div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Nessun referente registrato</div>';
+    return;
+  }
+
+  div.innerHTML = data.map(r => `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--wcl);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--wcd);flex-shrink:0">
+        ${r.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--tx)">${r.nome}</div>
+        ${r.ruolo ? `<div style="font-size:10px;font-weight:500;color:var(--wcd);background:var(--wcl);display:inline-block;padding:1px 7px;border-radius:20px;margin-top:2px">${r.ruolo}</div>` : ''}
+        <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">
+          ${r.telefono ? `<a href="tel:${r.telefono}" style="font-size:11px;color:var(--tx2);text-decoration:none;display:flex;align-items:center;gap:3px">📞 ${r.telefono}</a>` : ''}
+          ${r.email ? `<a href="mailto:${r.email}" style="font-size:11px;color:var(--wc);text-decoration:none;display:flex;align-items:center;gap:3px">✉️ ${r.email}</a>` : ''}
+          ${r.data_ultimo_contatto ? `<span style="font-size:11px;color:var(--tx3)">🗓️ Ultimo contatto: ${new Date(r.data_ultimo_contatto).toLocaleDateString('it-IT')}</span>` : ''}
+        </div>
+        ${r.note ? `<div style="font-size:11px;color:var(--tx3);margin-top:5px;font-style:italic">${r.note}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button onclick="modificaReferente('${r.id}')" style="background:none;border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--f)">✏️</button>
+        <button onclick="eliminaReferente('${r.id}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px">✕</button>
+      </div>
+    </div>`).join('') + '<div style="height:4px"></div>';
+}
+
+async function modificaReferente(id) {
+  const { data } = await sb.from('referenti_territorio').select('*').eq('id', id).single();
+  if (!data) return;
+  refEditId = id;
+  document.getElementById('mRefTitle').textContent = 'Modifica referente';
+  document.getElementById('refNome').value = data.nome || '';
+  document.getElementById('refRuolo').value = data.ruolo || '';
+  document.getElementById('refTel').value = data.telefono || '';
+  document.getElementById('refEmail').value = data.email || '';
+  document.getElementById('refNote').value = data.note || '';
+  document.getElementById('refDataContatto').value = data.data_ultimo_contatto || '';
+  document.getElementById('mReferente').classList.add('on');
+}
+
+async function eliminaReferente(id) {
+  if (!confirm('Eliminare questo referente?')) return;
+  await sb.from('referenti_territorio').delete().eq('id', id);
+  toast('Referente eliminato', 'success');
+  await loadReferenti(refTerritoryId);
 }
 
 // ── STORICO ANNO TOGGLE & UPLOAD ─────────────────────
