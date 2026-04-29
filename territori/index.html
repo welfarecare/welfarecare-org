@@ -68,7 +68,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
 .sb-tt{font-size:15px;font-weight:600;color:var(--tx)}
 .sb-a{display:flex;gap:8px;flex-shrink:0}
 .ct{flex:1;overflow-y:auto;padding:22px}
-.sec{display:none}.sec.on{display:block}
+.sec{display:none}.sec.on{display:block}.sec.on#s-mappa{display:flex}
 /* KPIS */
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
 .kpi{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px}
@@ -513,7 +513,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100vh;over
         </div>
 
         <!-- MAPPA -->
-        <div class="sec" id="s-mappa" style="height:calc(100vh - 120px);display:none;flex-direction:column">
+        <div class="sec" id="s-mappa" style="height:calc(100vh - 120px);flex-direction:column">
           <!-- Toolbar mappa -->
           <div style="display:flex;gap:10px;align-items:center;padding:12px 0;flex-shrink:0;flex-wrap:wrap">
             <select class="fs" id="mapFilterStato" onchange="filterMappaMarkers()" style="width:160px">
