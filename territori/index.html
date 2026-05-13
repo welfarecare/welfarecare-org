@@ -3,371 +3,396 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>WelfareCare — Gestionale Territori</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<title>WelfareCare — Territori</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --wc:#26ADE4;--wcd:#1a8fc2;--wcl:#e8f6fc;--wcm:#b3e2f5;
-  --bg:#f0f4f8;--sur:#fff;--sur2:#f7f9fb;
-  --bd:rgba(0,0,0,.07);--bd2:rgba(0,0,0,.12);
-  --tx:#0d1117;--tx2:#4a5568;--tx3:#94a3b8;
-  --f:'Poppins',sans-serif;--r:10px;--rl:16px;
+  --wc:#0ea5e9;--wcd:#0284c7;--wcl:#e0f2fe;--wcm:#7dd3fc;
+  --bg:#f8fafc;--sur:#ffffff;--sur2:#f1f5f9;--sur3:#e2e8f0;
+  --bd:#e2e8f0;--bd2:#cbd5e1;
+  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;--tx4:#cbd5e1;
+  --green:#10b981;--greenl:#d1fae5;
+  --yellow:#f59e0b;--yellowl:#fef3c7;
+  --red:#ef4444;--redl:#fee2e2;
+  --purple:#8b5cf6;--purplel:#ede9fe;
+  --f:'Inter',sans-serif;
+  --r:8px;--rl:12px;--rxl:16px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --sh-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
   --safe-b:env(safe-area-inset-bottom,0px);
-  --nav-h:60px;--top-h:52px;
+  --nav-h:56px;--top-h:56px;
 }
-html,body{font-family:var(--f);background:var(--bg);color:var(--tx);height:100%;-webkit-font-smoothing:antialiased}
-body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+
+html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased}
 
 /* ── TOPBAR ── */
-.tn{height:var(--top-h);background:var(--sur);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:100}
-.tn-back{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--tx3);text-decoration:none;padding:6px 8px;border-radius:var(--r);transition:background .15s;white-space:nowrap}
-.tn-back:hover,.tn-back:active{background:var(--sur2)}
-.tn-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
-.tn-div{width:1px;height:20px;background:var(--bd2);flex-shrink:0}
-.tn-logo{display:flex;align-items:center}
-.tn-logo svg{width:130px;height:20px}
-.tn-dept{font-size:10px;font-weight:500;color:var(--wcd);background:var(--wcl);padding:3px 9px;border-radius:20px;white-space:nowrap}
-.tn-sp{flex:1}
-.tn-srch{display:flex;align-items:center;gap:7px;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--r);padding:0 11px;height:32px}
-.tn-srch input{border:none;background:transparent;font-family:var(--f);font-size:12px;color:var(--tx);width:160px;outline:none}
-.tn-srch svg{width:12px;height:12px;color:var(--tx3);flex-shrink:0}
-.tn-u{display:flex;align-items:center;gap:7px;cursor:pointer;padding:4px 8px;border-radius:var(--r);position:relative}
-.tn-u:hover{background:var(--sur2)}
-.av{width:30px;height:30px;border-radius:50%;background:var(--wc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
-.tn-uname{font-size:12px;font-weight:500;color:var(--tx)}
-.umenu{position:absolute;top:calc(100% + 6px);right:0;background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:6px;min-width:150px;display:none;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.topbar{height:var(--top-h);background:var(--sur);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.tb-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.tb-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--wc),var(--wcd));border-radius:7px;display:flex;align-items:center;justify-content:center}
+.tb-logo-mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.tb-logo-name{font-size:14px;font-weight:700;color:var(--tx);letter-spacing:-.3px}
+.tb-logo-dept{font-size:11px;color:var(--tx3);margin-left:2px}
+.tb-div{width:1px;height:18px;background:var(--bd2)}
+.tb-sp{flex:1}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--r);padding:0 12px;height:34px;transition:border-color .15s}
+.tb-search:focus-within{border-color:var(--wc);background:var(--sur)}
+.tb-search svg{width:13px;height:13px;stroke:var(--tx3);fill:none;stroke-width:1.5;flex-shrink:0}
+.tb-search input{border:none;background:transparent;font-family:var(--f);font-size:13px;color:var(--tx);width:180px;outline:none}
+.tb-search input::placeholder{color:var(--tx3)}
+.tb-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 8px;border-radius:var(--r);position:relative;transition:background .12s}
+.tb-user:hover{background:var(--sur2)}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--wc),var(--wcd));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.tb-uname{font-size:12px;font-weight:500;color:var(--tx)}
+.umenu{position:absolute;top:calc(100% + 6px);right:0;background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:4px;min-width:150px;display:none;z-index:200;box-shadow:var(--sh-lg)}
 .umenu.on{display:block}
-.umi{padding:9px 12px;font-size:12px;color:var(--tx2);border-radius:var(--r);cursor:pointer}
-.umi:hover{background:var(--sur2);color:var(--tx)}
-.umi.red{color:#dc2626}.umi.red:hover{background:#fee2e2}
+.umi{padding:8px 12px;font-size:13px;color:var(--tx2);border-radius:var(--r);cursor:pointer;transition:background .1s}
+.umi:hover{background:var(--sur2)}
+.umi.red{color:var(--red)}.umi.red:hover{background:var(--redl)}
 
 /* ── LAYOUT ── */
-.app-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - var(--top-h))}
-.side{width:210px;background:var(--sur);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.snl{font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.07em;text-transform:uppercase;padding:14px 14px 4px}
-.ni{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:1px 8px;border-radius:var(--r);cursor:pointer;font-size:12px;color:var(--tx2);transition:background .12s;border:none;background:none;font-family:var(--f);width:calc(100% - 16px)}
-.ni:hover{background:var(--sur2);color:var(--tx)}
-.ni.on{background:var(--wcl);color:var(--wcd);font-weight:500}
-.ni svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5}
-.nib{margin-left:auto;background:var(--wc);color:#fff;font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px}
-.side-foot{margin-top:auto;border-top:1px solid var(--bd);padding:12px 14px;display:flex;align-items:center;gap:9px}
+.layout{display:flex;height:calc(100vh - var(--top-h))}
+.sidebar{width:220px;background:var(--sur);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.nav-section{padding:16px 12px 6px;font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;margin:1px 6px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--tx2);transition:all .12s;border:none;background:none;font-family:var(--f);width:calc(100% - 12px);text-align:left}
+.nav-item:hover{background:var(--sur2);color:var(--tx)}
+.nav-item.active{background:var(--wcl);color:var(--wcd);font-weight:500}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--wc);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;min-width:18px;text-align:center}
+.nav-badge.gray{background:var(--sur3);color:var(--tx3)}
+.sidebar-foot{margin-top:auto;padding:12px;border-top:1px solid var(--bd)}
 
 /* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.subbar{height:50px;background:var(--sur);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
-.subbar-title{font-size:14px;font-weight:600;color:var(--tx);flex:1}
-.content{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
-.sec{display:none}.sec.on{display:block}
-.sec.on#s-mappa{display:flex;flex-direction:column}
+.page-header{padding:20px 24px 16px;border-bottom:1px solid var(--bd);background:var(--sur);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.page-title{font-size:18px;font-weight:700;color:var(--tx);letter-spacing:-.3px}
+.page-subtitle{font-size:12px;color:var(--tx3);margin-top:1px}
+.page-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.content{flex:1;overflow-y:auto;padding:24px;-webkit-overflow-scrolling:touch}
+.view{display:none}.view.active{display:block}
 
-/* ── BOTTOM NAV (mobile only) ── */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bd);z-index:200;padding-bottom:var(--safe-b)}
-.bn-wrap{display:flex;justify-content:space-around}
-.bn-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;flex:1;border:none;background:none;font-family:var(--f);color:var(--tx3);font-size:9px;font-weight:500;transition:color .15s;position:relative;-webkit-tap-highlight-color:transparent}
-.bn-btn.on{color:var(--wc)}
-.bn-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5}
-.bn-dot{position:absolute;top:7px;right:calc(50% - 14px);background:var(--wc);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center;line-height:1.4}
+/* ── BUTTONS ── */
+.btn{font-family:var(--f);font-size:13px;font-weight:500;padding:8px 14px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bd2);background:var(--sur);color:var(--tx);transition:all .12s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;touch-action:manipulation}
+.btn:hover{background:var(--sur2);border-color:var(--bd2)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--wc);color:#fff;border-color:var(--wc)}
+.btn-primary:hover{background:var(--wcd);border-color:var(--wcd)}
+.btn-sm{font-size:12px;padding:5px 10px}
+.btn-icon{padding:7px;border-radius:var(--r)}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
 
-/* ── FAB ── */
-.fab{display:none;position:fixed;bottom:calc(var(--nav-h) + 12px + var(--safe-b));right:16px;width:52px;height:52px;border-radius:50%;background:var(--wc);color:#fff;border:none;font-size:24px;cursor:pointer;z-index:150;box-shadow:0 4px 16px rgba(38,173,228,.4);align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
-.fab:active{transform:scale(.95);box-shadow:0 2px 8px rgba(38,173,228,.4)}
-
-/* ── COMMON ── */
-.btn{font-family:var(--f);font-size:12px;font-weight:500;padding:8px 14px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--tx);transition:all .15s;display:inline-flex;align-items:center;gap:6px;touch-action:manipulation}
-.btn:active{opacity:.8}
-.btnp{background:var(--wc);color:#fff;border-color:var(--wc)}
-.btnp:hover{background:var(--wcd)}
-.btns{color:var(--tx2);border-color:var(--bd);font-size:11px;padding:6px 11px}
-.btnd{background:#dc2626;color:#fff;border-color:#dc2626}
-.fi{font-family:var(--f);font-size:14px;padding:11px 13px;border:1px solid var(--bd2);border-radius:var(--r);background:var(--sur);color:var(--tx);width:100%;outline:none;transition:border-color .15s;-webkit-appearance:none}
-.fi:focus{border-color:var(--wc);box-shadow:0 0 0 3px rgba(38,173,228,.1)}
-.fs{font-family:var(--f);font-size:14px;padding:11px 13px;border:1px solid var(--bd2);border-radius:var(--r);background:var(--sur);color:var(--tx);width:100%;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+/* ── INPUTS ── */
+.fi{font-family:var(--f);font-size:14px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);background:var(--sur);color:var(--tx);width:100%;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+.fi:focus{border-color:var(--wc);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
+.fs{font-family:var(--f);font-size:14px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);background:var(--sur);color:var(--tx);width:100%;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.fs:focus{border-color:var(--wc);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.fl{font-size:11px;font-weight:500;color:var(--tx2);letter-spacing:.01em}
-
-/* ── CARDS ── */
-.card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
-.card:last-child{margin-bottom:0}
-.ch{padding:13px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.ct2{font-size:13px;font-weight:600;color:var(--tx)}
-
-/* ── TABLE (desktop) ── */
-.tbl-wrap{overflow-x:auto}
-.tbl{width:100%;border-collapse:collapse;font-size:12px}
-.tbl th{padding:8px 14px;text-align:left;font-weight:500;font-size:10px;color:var(--tx3);background:var(--sur2);border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
-.tbl td{padding:10px 14px;border-bottom:1px solid var(--bd);color:var(--tx);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--sur2);cursor:pointer}
-
-/* ── MOB CARDS (mobile list alternative) ── */
-.mob-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
-.mob-card:active{background:var(--sur2);transform:scale(.99)}
-.mc-title{font-size:15px;font-weight:600;color:var(--tx);margin-bottom:3px}
-.mc-sub{font-size:12px;color:var(--tx3);margin-bottom:8px}
-.mc-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-
-/* ── KPI ── */
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.kpi{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:16px}
-.kl{font-size:10px;color:var(--tx3);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-.kv{font-size:26px;font-weight:700;color:var(--tx);line-height:1}
-.ks{font-size:10px;color:var(--tx3);margin-top:4px;display:flex;align-items:center;gap:4px}
-.kdot{width:6px;height:6px;border-radius:50%;background:var(--wc)}
-
-/* ── BADGES ── */
-.bx{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
-.bg{background:#d1fae5;color:#065f46}.ba{background:#fef3c7;color:#92400e}
-.bb{background:var(--wcl);color:var(--wcd)}.br{background:#fee2e2;color:#dc2626}
-.bk{background:var(--sur2);color:var(--tx2);border:1px solid var(--bd)}
-.bwc{background:var(--wc);color:#fff}
-
-/* ── TOOLBAR ── */
-.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.tb-sp{flex:1}
-.vt{display:flex;border:1px solid var(--bd2);border-radius:var(--r);overflow:hidden}
-.vtb{padding:8px 12px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--tx2);font-family:var(--f);display:flex;align-items:center;gap:5px;touch-action:manipulation}
-.vtb.on{background:var(--wc);color:#fff}
-.vtb svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
-
-/* ── GRUPPI ── */
-.rblock{margin-bottom:14px}
-.rhdr{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;touch-action:manipulation}
-.rhdr:active{background:var(--sur2)}
-.rn{font-size:13px;font-weight:600;color:var(--tx);flex:1}
-.rc{font-size:11px;color:var(--tx3)}
-.pblock{margin-left:14px;margin-bottom:3px}
-.phdr{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;margin-bottom:2px}
-.pn{font-size:12px;font-weight:500;color:var(--tx2);flex:1}
-.crow{margin-left:24px;display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:2px;cursor:pointer;font-size:12px;touch-action:manipulation}
-.crow:active{background:var(--wcl)}
-.cn{font-weight:500;color:var(--tx);flex:1}
-.chip{display:inline-flex;align-items:center;background:var(--sur2);border:1px solid var(--bd);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--tx2)}
-
-/* ── MODAL ── */
-.mbg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none;align-items:flex-end;justify-content:center;padding:0}
-.mbg.on{display:flex}
-.modal{background:var(--sur);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;border:1px solid var(--bd);box-shadow:0 -8px 40px rgba(0,0,0,.15);animation:slideUp .25s ease}
-@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mh{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--sur);z-index:1;border-radius:20px 20px 0 0}
-.mh::before{content:'';display:block;width:36px;height:4px;background:var(--bd2);border-radius:2px;position:absolute;top:8px;left:50%;transform:translateX(-50%)}
-.mt{font-size:15px;font-weight:600;color:var(--tx);padding-top:8px}
-.mc{background:none;border:none;font-size:22px;color:var(--tx3);cursor:pointer;padding:4px 8px;border-radius:var(--r);line-height:1;touch-action:manipulation}
-.mb{padding:18px 20px}
-.mf{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--sur);padding-bottom:calc(14px + var(--safe-b))}
+.fl{font-size:12px;font-weight:500;color:var(--tx2)}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fgrid .full{grid-column:1/-1}
-.slbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
-.slbl:first-child{margin-top:0}
+.fdivider{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;padding:14px 0 8px;border-bottom:1px solid var(--bd);margin-bottom:14px;grid-column:1/-1}
+.fdivider:first-child{padding-top:0}
 
-/* ── SCHEDA ── */
-.sgrid{display:grid;grid-template-columns:1fr 1fr}
-.sf2{padding:12px 16px;border-bottom:1px solid var(--bd)}
-.sf2:nth-child(odd){border-right:1px solid var(--bd)}
-.sf2.full{grid-column:1/-1}
-.slb{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
-.sv{font-size:13px;color:var(--tx)}
-.sv.big{font-size:22px;font-weight:600;color:var(--wc)}
+/* ── CARDS ── */
+.card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--sh)}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-title{font-size:13px;font-weight:600;color:var(--tx)}
+.card-body{padding:16px}
 
-/* ── BUDGET ── */
-.brow{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--bd);font-size:12px}
-.brow:last-child{border-bottom:none}
-.banno{font-weight:600;color:var(--tx);width:44px}
-.bbar{flex:1;height:5px;background:var(--sur2);border-radius:3px;overflow:hidden}
-.bfill{height:100%;border-radius:3px;background:var(--wc)}
-.bimp{font-weight:500;color:var(--tx);min-width:90px;text-align:right}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)}
+.stat-label{font-size:11px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;color:var(--tx);letter-spacing:-.5px;line-height:1}
+.stat-sub{font-size:11px;color:var(--tx3);margin-top:4px}
 
-/* ── PROGRAMMA ── */
-.inc-block{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:16px;overflow:hidden}
-.inc-hdr{padding:13px 18px;background:var(--wcl);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
-.inc-av{width:32px;height:32px;border-radius:50%;background:var(--wc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
-.inc-name{font-size:13px;font-weight:600;color:var(--wcd);flex:1}
-.inc-count{font-size:11px;color:var(--wcd)}
-.drag-list{padding:6px 0;min-height:48px}
-.drag-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd);cursor:grab;transition:background .12s;user-select:none}
-.drag-item:last-child{border-bottom:none}
-.drag-item:active{background:var(--sur2)}
-.drag-item.dragging{opacity:.4;background:var(--wcl)}
-.drag-handle{color:var(--tx3);font-size:16px;flex-shrink:0}
-.drag-num{width:24px;height:24px;border-radius:50%;background:var(--wc);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.drag-info{flex:1;min-width:0}
-.drag-comune{font-size:12px;font-weight:500;color:var(--tx)}
-.drag-sub{font-size:10px;color:var(--tx3)}
-.drag-actions{display:flex;gap:5px;flex-shrink:0}
-.stato-pill{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;cursor:pointer;border:none;font-family:var(--f);touch-action:manipulation}
-.sp-pian{background:#e8f6fc;color:#1a8fc2}
-.sp-corso{background:#fef3c7;color:#92400e}
-.sp-comp{background:#d1fae5;color:#065f46}
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:var(--rl);border:1px solid var(--bd);background:var(--sur);box-shadow:var(--sh)}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{padding:10px 14px;text-align:left;font-weight:500;font-size:11px;color:var(--tx3);background:var(--sur2);border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.table td{padding:12px 14px;border-bottom:1px solid var(--bd);color:var(--tx);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}
+.table tbody tr{transition:background .1s;cursor:pointer}
+.table tbody tr:hover td{background:#f8fafc}
+.table-empty{text-align:center;padding:48px;color:var(--tx3);font-size:13px}
 
-/* ── ASSEGNAZIONI ── */
-.ass-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:12px;overflow:hidden}
-.ass-head{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer;touch-action:manipulation}
-.ass-head:active{background:var(--sur2)}
-.ass-stato{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;flex-shrink:0}
-.ass-s-bozza{background:#f1f5f9;color:#64748b}
-.ass-s-confermata{background:var(--wcl);color:var(--wcd)}
-.ass-s-in_lavorazione{background:#fef3c7;color:#92400e}
-.ass-s-completata{background:#d1fae5;color:#065f46}
-.ass-comune{font-size:14px;font-weight:600;color:var(--tx)}
-.ass-meta{font-size:11px;color:var(--tx3);margin-top:3px}
-.ass-body{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ass-field{display:flex;flex-direction:column;gap:3px}
-.ass-label{font-size:9px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
-.ass-value{font-size:12px;color:var(--tx)}
-.ass-foot{padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.mod-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px}
-.mod-patrocinio{background:#e0e7ff;color:#3730a3}
-.mod-suolo_pubblico{background:#fef3c7;color:#92400e}
-.mod-location_privata{background:#d1fae5;color:#065f46}
-
-/* ── WIZARD PROGRAMMA ── */
-.wz-step{color:var(--tx3);transition:background .15s}
-.wz-step.on{background:var(--wcl);color:var(--wcd)}
-.wz-step.done{background:#d1fae5;color:#065f46}
-.wz-num{width:22px;height:22px;border-radius:50%;background:var(--bd2);color:var(--tx3);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.wz-step.on .wz-num{background:var(--wc);color:#fff}
-.wz-step.done .wz-num{background:#065f46;color:#fff}
-.sel-item{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--bd);font-size:12px}
-.sel-item:last-child{border-bottom:none}
-.sel-handle{color:var(--tx3);cursor:grab;font-size:14px}
-.sel-num{width:20px;height:20px;border-radius:50%;background:var(--wc);color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sel-nome{flex:1;font-weight:500;font-size:11px;color:var(--tx)}
-.sel-rm{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;touch-action:manipulation}
-
-/* ── MISC ── */
-.empty{text-align:center;padding:36px;color:var(--tx3);font-size:12px;line-height:1.6}
-.loading{text-align:center;padding:28px;color:var(--tx3);font-size:12px}
-.toast{position:fixed;bottom:calc(var(--nav-h) + 12px + var(--safe-b));left:50%;transform:translateX(-50%);background:var(--tx);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:12px;font-weight:500;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.2);white-space:nowrap;max-width:90vw}
-.toast.success{background:#059669}.toast.error{background:#dc2626}
-
-/* ── LEAFLET ── */
-.leaflet-popup-content-wrapper{font-family:var(--f);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.15)}
-.leaflet-popup-content{margin:12px 16px;font-size:12px;color:var(--tx);min-width:160px}
-
-/* ══════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════ */
-@media(max-width:768px){
-  /* Layout */
-  .app-body{height:calc(100vh - var(--top-h));overflow:hidden}
-  .side{display:none}
-  .main{overflow:hidden}
-  .subbar{display:none}
-  .content{padding:14px 12px;padding-bottom:calc(var(--nav-h) + 20px + var(--safe-b));height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
-
-  /* Show mobile nav */
-  .bottom-nav{display:block}
-  .fab{display:flex}
-
-  /* Topnav */
-  .tn{padding:0 12px;gap:8px;height:52px}
-  .tn-dept,.tn-srch{display:none}
-  .tn-uname{display:none}
-  .tn-div:last-of-type{display:none}
-
-  /* Tables hidden → cards shown */
-  .tbl-wrap,.tbl{display:none}
-  .mob-list{display:block!important}
-
-  /* Modal full bottom sheet */
-  .mbg{align-items:flex-end}
-  .modal{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;max-height:90vh}
-
-  /* Grid → 1 col */
-  .fgrid{grid-template-columns:1fr}
-  .fgrid .full{grid-column:1}
-  .kpis{grid-template-columns:1fr 1fr}
-  .sgrid{grid-template-columns:1fr}
-  .sf2{border-right:none!important}
-  .sf2:nth-child(odd){border-right:none!important}
-  .ass-body{grid-template-columns:1fr}
-
-  /* Drag items stacked */
-  .drag-item{flex-wrap:wrap;gap:8px}
-  .drag-handle{display:none}
-  .drag-actions{flex:0 0 100%;justify-content:flex-end}
-
-  /* Assegnazioni */
-  .ass-foot{gap:6px}
-
-  /* Toolbar */
-  .toolbar{gap:6px}
-  .toolbar .fi,.toolbar .fs{min-width:0;flex:1}
-  .tb-sp{display:none}
-  .vt{width:100%;order:10}
-  .vtb{flex:1;justify-content:center}
-
-  /* Mappa */
-  #s-mappa{height:calc(100vh - var(--top-h) - var(--nav-h) - var(--safe-b))}
-
-  /* Input sizes */
-  .fi,.fs{font-size:16px} /* prevent zoom on iOS */
-
-  /* KPI */
-  .kv{font-size:22px}
-}
-
-@media(min-width:769px){
-  .mob-list{display:none!important}
-  .bottom-nav{display:none!important}
-  .fab{display:none!important}
-}
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;gap:4px;white-space:nowrap}
+.badge-green{background:var(--greenl);color:#065f46}
+.badge-yellow{background:var(--yellowl);color:#92400e}
+.badge-red{background:var(--redl);color:#991b1b}
+.badge-blue{background:var(--wcl);color:var(--wcd)}
+.badge-purple{background:var(--purplel);color:#5b21b6}
+.badge-gray{background:var(--sur2);color:var(--tx3);border:1px solid var(--bd)}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 
 /* ── PIPELINE KANBAN ── */
-.kanban-board{display:flex;gap:14px;align-items:flex-start;min-width:900px;padding-bottom:4px}
-.kanban-col{flex:0 0 200px;background:var(--sur2);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden}
-.kanban-head{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px}
-.kanban-label{font-size:11px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:6px}
-.kanban-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.kanban-count{background:var(--bd2);color:var(--tx3);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
-.kanban-body{padding:8px;min-height:80px;display:flex;flex-direction:column;gap:6px}
-.kanban-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .15s}
-.kanban-card:hover{border-color:var(--wc);box-shadow:0 2px 8px rgba(38,173,228,.1)}
+.kanban-wrap{overflow-x:auto;padding-bottom:8px}
+.kanban{display:flex;gap:12px;min-width:900px}
+.kanban-col{flex:0 0 195px;background:var(--sur2);border-radius:var(--rl);border:1px solid var(--bd);overflow:hidden}
+.kanban-col-header{padding:12px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd)}
+.kanban-col-title{font-size:12px;font-weight:600;color:var(--tx);flex:1}
+.kanban-col-count{font-size:11px;font-weight:600;color:var(--tx3);background:var(--sur);border:1px solid var(--bd);border-radius:20px;padding:1px 7px}
+.kanban-col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kanban-col-body{padding:8px;min-height:100px;display:flex;flex-direction:column;gap:6px}
+.kanban-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
+.kanban-card:hover{border-color:var(--wc);box-shadow:0 0 0 2px rgba(14,165,233,.1),var(--sh-md);transform:translateY(-1px)}
 .kanban-card:active{transform:scale(.98)}
-.kc-comune{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px}
-.kc-prov{font-size:10px;color:var(--tx3)}
-.kc-date{font-size:10px;color:var(--tx3);margin-top:5px}
-.kc-note{font-size:10px;color:var(--tx2);margin-top:4px;font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.kc-multi{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px}
-.kc-fase-chip{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px}
+.kc-name{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px}
+.kc-meta{font-size:11px;color:var(--tx3)}
+.kc-date{font-size:10px;color:var(--tx4);margin-top:5px;display:flex;align-items:center;gap:3px}
+.kc-note{font-size:10px;color:var(--tx3);margin-top:4px;font-style:italic;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.kanban-add{width:100%;padding:7px;border:1.5px dashed var(--bd2);border-radius:var(--r);background:none;color:var(--tx3);font-family:var(--f);font-size:11px;cursor:pointer;transition:all .15s;margin-top:2px}
+.kanban-add:hover{border-color:var(--wc);color:var(--wcd);background:var(--wcl)}
 
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+.modal{background:var(--sur);border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg);animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:12px auto 0}
+.modal-header{padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:15px;font-weight:600;color:var(--tx)}
+.modal-close{background:none;border:none;width:28px;height:28px;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:16px;transition:background .12s}
+.modal-close:hover{background:var(--sur2)}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--sur);padding-bottom:calc(14px + var(--safe-b))}
+
+/* ── SCHEDA TERRITORIO ── */
+.scheda-header{background:linear-gradient(135deg,var(--wcd),var(--wc));border-radius:var(--rl) var(--rl) 0 0;padding:24px;color:#fff}
+.scheda-nome{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.scheda-meta{font-size:13px;opacity:.85}
+.scheda-body{padding:0}
+.scheda-section{padding:16px 20px;border-bottom:1px solid var(--bd)}
+.scheda-section:last-child{border-bottom:none}
+.scheda-section-title{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.scheda-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scheda-field{display:flex;flex-direction:column;gap:3px}
+.scheda-label{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em}
+.scheda-value{font-size:14px;color:var(--tx);font-weight:500}
+.scheda-value.big{font-size:20px;font-weight:700;color:var(--wc)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(20px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(10px);background:var(--tx);color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:999;display:none;box-shadow:var(--sh-lg);max-width:90vw;white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.toolbar-sp{flex:1}
+
+/* ── PIPELINE FASE LABELS ── */
+.fase-da_contattare{background:#f1f5f9;color:#475569}
+.fase-contattato{background:var(--yellowl);color:#92400e}
+.fase-patrocinio_concesso{background:var(--greenl);color:#065f46}
+.fase-patrocinio_negato{background:var(--redl);color:#991b1b}
+.fase-suolo_pubblico{background:var(--purplel);color:#5b21b6}
+.fase-location_selezionata{background:var(--wcl);color:var(--wcd)}
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bd);z-index:200;padding-bottom:var(--safe-b);box-shadow:0 -1px 0 var(--bd)}
+.bn-wrap{display:flex}
+.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;border:none;background:none;font-family:var(--f);color:var(--tx3);font-size:9px;font-weight:500;transition:color .12s;position:relative}
+.bn-btn.active{color:var(--wc)}
+.bn-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+/* ── FAB (mobile) ── */
+.fab{display:none;position:fixed;bottom:calc(var(--nav-h) + 14px + var(--safe-b));right:16px;width:50px;height:50px;border-radius:50%;background:var(--wc);color:#fff;border:none;font-size:22px;cursor:pointer;z-index:150;box-shadow:0 4px 14px rgba(14,165,233,.4);align-items:center;justify-content:center;transition:transform .15s}
+.fab:active{transform:scale(.94)}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px}
+.empty-icon{width:48px;height:48px;background:var(--sur2);border-radius:var(--rl);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.empty-icon svg{width:22px;height:22px;stroke:var(--tx3);fill:none;stroke-width:1.5}
+.empty-title{font-size:15px;font-weight:600;color:var(--tx);margin-bottom:6px}
+.empty-desc{font-size:13px;color:var(--tx3);line-height:1.6;max-width:300px;margin:0 auto 20px}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:768px){
+  .layout{height:auto;min-height:calc(100vh - var(--top-h))}
+  .sidebar{display:none}
+  .main{overflow:visible}
+  .content{padding:14px 12px;padding-bottom:calc(var(--nav-h) + 20px + var(--safe-b))}
+  .page-header{padding:14px 14px 12px}
+  .page-title{font-size:16px}
+  .bottom-nav{display:block}
+  .fab{display:flex}
+  .tb-search{display:none}
+  .tb-uname{display:none}
+  .overlay{align-items:flex-end}
+  .modal{max-width:100%;border-radius:20px 20px 0 0}
+  .fgrid{grid-template-columns:1fr}
+  .fgrid .full{grid-column:1}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-value{font-size:22px}
+  .kanban-wrap{margin:0 -12px;padding:0 12px 8px}
+  .fi,.fs{font-size:16px}
+  .scheda-grid{grid-template-columns:1fr}
+  .table-wrap{overflow-x:auto}
+  .table{min-width:500px}
+}
+@media(min-width:769px){
+  .layout{overflow:hidden}
+  .main{overflow:hidden}
+  .content{overflow-y:auto;height:100%}
+}
 </style>
 </head>
 <body>
+
 <div class="toast" id="toast"></div>
 
 <!-- TOPBAR -->
-<div class="tn">
-  <a href="/" class="tn-back">
-    <svg viewBox="0 0 16 16"><path d="M10 12L6 8l4-4"/></svg>
-    <span>Portale</span>
+<div class="topbar">
+  <a href="/" class="tb-logo">
+    <div class="tb-logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <div class="tb-logo-name">WelfareCare</div>
+    </div>
   </a>
-  <div class="tn-div"></div>
-  <div class="tn-logo">
-    <svg viewBox="0 0 453 67" xmlns="http://www.w3.org/2000/svg">
-      <polygon fill="#26ADE4" points="49,64 39.5,23.7 29.7,64 17.5,64 0,2 13.8,2 24,42.2 32.6,2 46.2,2 55.6,42.2 65.7,2 78.9,2 61.6,64"/>
-      <path fill="#26ADE4" d="M85.5,44.2c.2,3.5,1.2,6.3,3,8.3s4.2,3.1,7.2,3.1c2,0,3.8-.5,5.3-1.4s2.5-2.2,2.9-3.8h12.5c-1.4,4.7-3.9,8.4-7.5,10.9s-7.8,3.8-12.7,3.8c-15.3,0-23-8.3-23-25,0-3.6.5-6.8,1.5-9.6s2.4-5.3,4.3-7.4,4.2-3.6,7-4.7,5.9-1.6,9.4-1.6c7.1,0,12.5,2.3,16.1,6.8s5.5,11.4,5.5,20.5H85.5z"/>
-      <rect fill="#26ADE4" x="120.9" y="1.3" width="12.1" height="62.7"/>
-      <path fill="#26ADE4" d="M142.5,64V26.7h-6.8V18.1h6.8C142.5,6.9,149,1.3,162,1.3v9.8c-1.6,0-2.8.1-3.8.3s-1.7.6-2.3,1.2-.9,1.3-1.2,2.2-.3,2-.3,3.3h7.8v8.6h-7.8V64H142.5z"/>
-      <path fill="#26ADE4" d="M335.5,42.7c-.7,3.5-1.8,6.8-3.3,9.6s-3.4,5.3-5.6,7.4-4.9,3.6-7.9,4.8-6.3,1.7-9.9,1.7c-4,0-7.8-.7-11.3-2.1s-6.6-3.4-9.1-6.2-4.6-6.1-6-10.1-2.2-8.7-2.2-14c0-5.2.7-9.9,2-14.1s3.2-7.7,5.7-10.6,5.5-5.1,9.1-6.7S304.6,0,309.1,0c3.9,0,7.4.6,10.5,1.7s5.9,2.7,8.1,4.8,4.1,4.4,5.4,7.1,2.2,5.7,2.5,8.8h-13c-.9-3.6-2.6-6.3-5-8.3s-5.3-2.9-8.4-2.9c-5.4,0-9.4,1.9-11.9,5.8s-3.8,9.2-3.8,16c0,6.9,1.3,12.3,3.8,16.1s6.3,5.7,11.3,5.7c3.9,0,7-1,9.3-3.1s3.9-5.1,4.8-9H335.5z"/>
-      <path fill="#26ADE4" d="M382.8,64V18.1h11.4v5.5c1-1.6,2-2.8,3.1-3.6s2.2-1.5,3.4-2,2.3-.8,3.5-.9,2.4-.2,3.6-.2h1.6v12.4c-1.1-.2-2.2-.3-3.4-.3-7.4,0-11.1,3.7-11.1,11.1V64H382.8z"/>
-      <path fill="#26ADE4" d="M420.9,44.2c.2,3.5,1.2,6.3,3,8.3s4.2,3.1,7.2,3.1c2,0,3.8-.5,5.3-1.4s2.5-2.2,2.9-3.8h12.5c-1.4,4.7-3.9,8.4-7.5,10.9s-7.8,3.8-12.7,3.8c-15.3,0-23-8.3-23-25,0-3.6.5-6.8,1.5-9.6s2.4-5.3,4.3-7.4,4.2-3.6,7-4.7,5.9-1.6,9.4-1.6c7.1,0,12.5,2.3,16.1,6.8s5.5,11.4,5.5,20.5H420.9z"/>
-    </svg>
+  <div class="tb-div"></div>
+  <span style="font-size:12px;color:var(--tx3);font-weight:500">Reparto Patrocini</span>
+  <div class="tb-sp"></div>
+  <div class="tb-search">
+    <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5l3 3"/></svg>
+    <input placeholder="Cerca territorio..." id="searchInput" oninput="handleSearch(this.value)"/>
   </div>
-  <div class="tn-dept">Reparto Patrocini</div>
-  <div class="tn-sp"></div>
-  <div class="tn-srch">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4"/><path d="M10.5 10.5l3 3"/></svg>
-    <input placeholder="Cerca comune..." id="srchInput" oninput="handleSearch(this.value)"/>
-  </div>
-  <div class="tn-u" onclick="toggleMenu()">
+  <div class="tb-user" onclick="document.getElementById('uMenu').classList.toggle('on')">
     <div class="av" id="topAv">??</div>
-    <div class="tn-uname" id="topName">Utente</div>
+    <span class="tb-uname" id="topName">—</span>
     <div class="umenu" id="uMenu">
       <div class="umi red" onclick="logout()">Esci</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">Menu</div>
+    <button class="nav-item active" data-view="dashboard" onclick="showView('dashboard')">
+      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-view="territori" onclick="showView('territori')">
+      <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5z"/></svg>
+      Territori
+      <span class="nav-badge gray" id="badgeTerritori">0</span>
+    </button>
+    <button class="nav-item" data-view="pipeline" onclick="showView('pipeline')">
+      <svg viewBox="0 0 16 16"><rect x="1" y="2" width="3" height="12" rx="1"/><rect x="7" y="2" width="3" height="12" rx="1"/><rect x="13" y="2" width="3" height="12" rx="1"/></svg>
+      Pipeline
+    </button>
+    <div class="sidebar-foot">
+      <div style="font-size:11px;color:var(--tx3)" id="sideRole">—</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-subtitle" id="pageSubtitle">Panoramica attività</div>
+      </div>
+      <div class="page-actions" id="pageActions"></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="view active" id="view-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Territori totali</div>
+            <div class="stat-value" id="statTot">—</div>
+            <div class="stat-sub">comuni registrati</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">In pipeline</div>
+            <div class="stat-value" id="statPipeline" style="color:var(--wc)">—</div>
+            <div class="stat-sub">in lavorazione</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Patrocinati</div>
+            <div class="stat-value" id="statPatrocinio" style="color:var(--green)">—</div>
+            <div class="stat-sub">patrocinio concesso</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Regioni</div>
+            <div class="stat-value" id="statRegioni">—</div>
+            <div class="stat-sub">coperte</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Ultimi territori aggiunti</span>
+            <button class="btn btn-sm" onclick="showView('territori')">Vedi tutti →</button>
+          </div>
+          <div class="table-wrap" style="border:none;border-radius:0;box-shadow:none">
+            <table class="table">
+              <thead><tr><th>Territorio</th><th>Regione</th><th>Provincia</th><th>Abitanti</th><th>Pipeline</th></tr></thead>
+              <tbody id="dashTable"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--tx3)">Caricamento...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TERRITORI ── -->
+      <div class="view" id="view-territori">
+        <div class="toolbar">
+          <input class="fi" style="max-width:240px;margin:0;font-size:13px" placeholder="Cerca territorio..." id="terrSearch" oninput="filterTerritori()"/>
+          <select class="fs" style="max-width:160px" id="terrRegione" onchange="filterTerritori()">
+            <option value="">Tutte le regioni</option>
+          </select>
+          <div class="toolbar-sp"></div>
+          <span style="font-size:12px;color:var(--tx3)" id="terrCount"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Territorio</th>
+                <th>Regione</th>
+                <th>Provincia</th>
+                <th>Abitanti</th>
+                <th>P.IVA</th>
+                <th>Pipeline</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="terrTable">
+              <tr><td colspan="7" style="text-align:center;padding:48px;color:var(--tx3)">Caricamento...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PIPELINE ── -->
+      <div class="view" id="view-pipeline">
+        <div class="toolbar">
+          <input class="fi" style="max-width:220px;margin:0;font-size:13px" placeholder="Cerca territorio..." id="plSearch" oninput="loadPipeline()"/>
+          <select class="fs" style="max-width:150px" id="plRegione" onchange="loadPipeline()">
+            <option value="">Tutte le regioni</option>
+          </select>
+          <div class="toolbar-sp"></div>
+        </div>
+        <div class="kanban-wrap">
+          <div class="kanban" id="kanban">
+            <div style="text-align:center;padding:48px;color:var(--tx3);width:100%">Caricamento...</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -375,2305 +400,529 @@ body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bn-wrap">
-    <button class="bn-btn on" data-s="dash" onclick="navTo('dash')">
+    <button class="bn-btn active" data-view="dashboard" onclick="showView('dashboard')">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Home
     </button>
-    <button class="bn-btn" data-s="terr" onclick="navTo('terr')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+    <button class="bn-btn" data-view="territori" onclick="showView('territori')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"/></svg>
       Territori
-      <span class="bn-dot" id="terrDot" style="display:none"></span>
     </button>
-    <button class="bn-btn" data-s="assegnazioni" onclick="navTo('assegnazioni')">
-      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-      Assegna
-      <span class="bn-dot" id="assDot" style="display:none"></span>
-    </button>
-    <button class="bn-btn" data-s="programma" onclick="navTo('programma')">
-      <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-      Programma
-      <span class="bn-dot" id="prDot" style="display:none"></span>
-    </button>
-    <button class="bn-btn" data-s="pipeline" onclick="navTo('pipeline')">
+    <button class="bn-btn" data-view="pipeline" onclick="showView('pipeline')">
       <svg viewBox="0 0 24 24"><rect x="2" y="3" width="4" height="18" rx="1"/><rect x="10" y="3" width="4" height="18" rx="1"/><rect x="18" y="3" width="4" height="18" rx="1"/></svg>
       Pipeline
-    </button>
-    <button class="bn-btn" data-s="mappa" onclick="navTo('mappa')">
-      <svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-      Mappa
     </button>
   </div>
 </div>
 
 <!-- FAB -->
-<button class="fab" id="fabBtn" onclick="fabAction()" style="display:none">+</button>
+<button class="fab" id="fab" onclick="fabAction()">+</button>
 
-<!-- APP BODY -->
-<div class="app-body">
-  <!-- SIDEBAR (desktop) -->
-  <nav class="side">
-    <div class="snl">Principale</div>
-    <button class="ni on" data-s="dash" onclick="navTo('dash')">
-      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Dashboard
-    </button>
-    <button class="ni" data-s="terr" onclick="navTo('terr')">
-      <svg viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z"/></svg>Territori
-      <span class="nib" id="terrBadge">0</span>
-    </button>
-    <button class="ni" data-s="pipeline" onclick="navTo('pipeline')">
-      <svg viewBox="0 0 16 16"><path d="M1 3h3v10H1zM7 3h2v10H7zM13 3h2v10h-2z"/><path d="M4 6h3M9 6h4M4 10h3M9 10h4"/></svg>Pipeline
-    </button>
-    <button class="ni" data-s="mappa" onclick="navTo('mappa')">
-      <svg viewBox="0 0 16 16"><polygon points="1 4 1 14 6 11 11 14 15 11 15 2 11 5 6 2 1 4"/><line x1="6" y1="2" x2="6" y2="11"/><line x1="11" y1="5" x2="11" y2="14"/></svg>Mappa
-    </button>
-    <button class="ni" data-s="assegnazioni" onclick="navTo('assegnazioni')">
-      <svg viewBox="0 0 16 16"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><circle cx="13" cy="11" r="2.5"/></svg>Assegnazioni
-      <span class="nib" id="assBadge">0</span>
-    </button>
-    <button class="ni" data-s="programma" onclick="navTo('programma')">
-      <svg viewBox="0 0 16 16"><path d="M2 2h12v2H2zM2 7h8v2H2zM2 12h10v2H2z"/><path d="M12 9l2 2-2 2"/></svg>Programma
-      <span class="nib" id="prBadge">0</span>
-    </button>
-    <div class="side-foot">
-      <div class="av" id="sideAv">??</div>
-      <div>
-        <div style="font-size:12px;font-weight:500" id="sideName">Utente</div>
-        <div style="font-size:10px;color:var(--tx3)" id="sideRole">—</div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- MAIN CONTENT -->
-  <div class="main">
-    <div class="subbar">
-      <div class="subbar-title" id="ttl">Dashboard</div>
-      <div style="display:flex;gap:8px" id="subbarActions"></div>
-    </div>
-    <div class="content">
-
-      <!-- ── DASHBOARD ── -->
-      <div class="sec on" id="s-dash">
-        <div class="kpis">
-          <div class="kpi"><div class="kl">Territori</div><div class="kv" id="kTot">—</div><div class="ks"><span class="kdot"></span>comuni totali</div></div>
-          <div class="kpi"><div class="kl">Regioni</div><div class="kv" id="kReg" style="color:var(--wc)">—</div><div class="ks">coperte</div></div>
-        </div>
-        <div class="card">
-          <div class="ch">
-            <span class="ct2">Ultimi territori</span>
-            <button class="btn btns" onclick="navTo('terr')">Vedi tutti →</button>
-          </div>
-          <div class="tbl-wrap">
-            <table class="tbl">
-              <thead><tr><th>Comune</th><th>Provincia</th><th>Regione</th><th>CAP</th><th>Incaricato</th></tr></thead>
-              <tbody id="dashTb"><tr><td colspan="5" class="loading">Caricamento...</td></tr></tbody>
-            </table>
-          </div>
-          <div class="mob-list" id="dashMobList"></div>
-        </div>
-      </div>
-
-      <!-- ── TERRITORI ── -->
-      <div class="sec" id="s-terr">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-size:13px;font-weight:600;color:var(--tx)" id="terrTitle">Territori</div>
-          <button class="btn btnp" onclick="openModalTerr()" style="font-size:12px">+ Nuovo territorio</button>
-        </div>
-        <div class="toolbar">
-          <input class="fi" style="flex:1;min-width:140px;margin:0;font-size:14px" placeholder="Cerca comune..." id="tSearch" oninput="renderView()"/>
-          <select class="fs" style="flex:1;min-width:120px" id="fReg" onchange="updateProv();renderView()">
-            <option value="">Tutte le regioni</option>
-          </select>
-          <select class="fs" style="flex:1;min-width:120px" id="fProv" onchange="renderView()">
-            <option value="">Tutte le province</option>
-          </select>
-          <div class="vt">
-            <button class="vtb on" id="vLista" onclick="setView('lista')">
-              <svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12"/></svg>Lista
-            </button>
-            <button class="vtb" id="vGruppo" onclick="setView('gruppo')">
-              <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Gruppi
-            </button>
-          </div>
-        </div>
-        <div class="card" id="vListaWrap">
-          <div class="ch"><span class="ct2" id="terrCount"></span></div>
-          <div class="tbl-wrap">
-            <table class="tbl">
-              <thead><tr><th>Comune</th><th>Provincia</th><th>Regione</th><th>CAP</th><th>P.IVA</th><th>Pipeline</th></tr></thead>
-              <tbody id="terrTb"><tr><td colspan="7" class="loading">Caricamento...</td></tr></tbody>
-            </table>
-          </div>
-          <div class="mob-list" id="terrMobList"></div>
-        </div>
-        <div id="vGruppoWrap" style="display:none"><div id="gruppoBody"><div class="loading">Caricamento...</div></div></div>
-      </div>
-
-      <!-- ── PIPELINE ── -->
-      <div class="sec" id="s-pipeline">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
-          <select class="fs" id="plFilterReg" onchange="loadPipeline()" style="flex:1;min-width:120px">
-            <option value="">Tutte le regioni</option>
-          </select>
-          <select class="fs" id="plFilterAnno" onchange="loadPipeline()" style="flex:1;min-width:90px">
-            <option value="">Tutti gli anni</option>
-          </select>
-          <input class="fi" id="plSearch" placeholder="Cerca comune..." oninput="loadPipeline()" style="flex:1;min-width:130px;margin:0"/>
-        </div>
-        <div id="pipelineKanban" style="overflow-x:auto;padding-bottom:8px">
-          <div class="loading">Caricamento...</div>
-        </div>
-      </div>
-
-      <!-- ── MAPPA ── -->
-      <div class="sec" id="s-mappa">
-        <div style="display:flex;gap:8px;align-items:center;padding-bottom:10px;flex-shrink:0;flex-wrap:wrap">
-          <select class="fs" id="mapFilterStato" onchange="filterMappaMarkers()" style="flex:1;min-width:130px">
-            <option value="">Tutti gli stati</option>
-            <option value="attivo">Attivi</option>
-            <option value="NO">NO</option>
-            <option value="MAIL">Mail</option>
-            <option value="ASSEGNATO">Assegnati</option>
-            <option value="SOSPESO">Sospesi</option>
-            <option value="PATROCINIO">Patrocinio</option>
-          </select>
-          <select class="fs" id="mapFilterReg" onchange="filterMappaMarkers()" style="flex:1;min-width:130px">
-            <option value="">Tutte le regioni</option>
-          </select>
-          <select class="fs" id="mapFilterInc" onchange="filterMappaMarkers()" style="flex:1;min-width:130px">
-            <option value="">Tutti gli incaricati</option>
-          </select>
-          <div style="font-size:11px;color:var(--tx3);flex-shrink:0" id="mapCount">— comuni</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:10px;align-items:center;padding-bottom:10px;flex-shrink:0">
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#26ADE4;display:inline-block"></span>Attivo</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block"></span>NO</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span>Mail</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#10b981;display:inline-block"></span>Assegnato</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#8b5cf6;display:inline-block"></span>Patrocinio</span>
-          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block"></span>Altro</span>
-        </div>
-        <div id="mapContainer" style="flex:1;border-radius:var(--rl);overflow:hidden;border:1px solid var(--bd);min-height:300px"></div>
-      </div>
-
-      <!-- ── ASSEGNAZIONI ── -->
-      <div class="sec" id="s-assegnazioni">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
-          <select class="fs" id="assFilterAnno" onchange="loadAssegnazioni()" style="flex:1;min-width:90px"></select>
-          <select class="fs" id="assFilterInc" onchange="loadAssegnazioni()" style="flex:1;min-width:130px">
-            <option value="">Tutti gli incaricati</option>
-          </select>
-          <select class="fs" id="assFilterStato" onchange="loadAssegnazioni()" style="flex:1;min-width:120px">
-            <option value="">Tutti gli stati</option>
-            <option value="bozza">Bozza</option>
-            <option value="confermata">Confermata</option>
-            <option value="in_lavorazione">In lavorazione</option>
-            <option value="completata">Completata</option>
-          </select>
-          <input class="fi" id="assSearch" placeholder="Cerca..." oninput="loadAssegnazioni()" style="flex:1;min-width:120px;margin:0"/>
-        </div>
-        <div id="assBody"><div class="loading">Caricamento...</div></div>
-      </div>
-
-      <!-- ── PROGRAMMA ── -->
-      <div class="sec" id="s-programma">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
-          <select class="fs" id="prAnno" onchange="loadProgramma()" style="flex:1;min-width:90px"></select>
-          <select class="fs" id="prIncaricato" onchange="loadProgramma()" style="flex:1;min-width:150px">
-            <option value="">Tutti gli incaricati</option>
-          </select>
-          <button class="btn btnp" onclick="generaProgramma()" id="btnGeneraProgramma" style="white-space:nowrap">
-            <svg viewBox="0 0 16 16" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.8"><path d="M2 8h2l2-5 3 10 2-5h3"/></svg>
-            Genera
-          </button>
-        </div>
-        <div id="programmaBody"><div class="loading">Caricamento...</div></div>
-      </div>
-
-    </div>
-  </div>
-</div>
-<!-- MODAL TERRITORIO -->
-<div class="mbg" id="mTerr">
+<!-- ══ MODAL NUOVO/MODIFICA TERRITORIO ══ -->
+<div class="overlay" id="modalTerritorio">
   <div class="modal">
-    <div class="mh"><div class="mt" id="mTerrTitle">Nuovo territorio</div><button class="mc" onclick="closeM('mTerr')">✕</button></div>
-    <div class="mb">
-      <div class="slbl">Localizzazione</div>
-      <div class="fgrid">
-        <div class="fg"><div class="fl">Regione *</div><input class="fi" id="tReg" placeholder="Es. Veneto"/></div>
-        <div class="fg"><div class="fl">Provincia *</div><input class="fi" id="tProv" placeholder="Es. Venezia"/></div>
-        <div class="fg"><div class="fl">Comune *</div><input class="fi" id="tCom" placeholder="Es. Mestre"/></div>
-        <div class="fg"><div class="fl">CAP</div><input class="fi" id="tCap" placeholder="Es. 30170" maxlength="5"/></div>
-      </div>
-      <div class="slbl">Dati territoriali</div>
-      <div class="fgrid">
-        <div class="fg"><div class="fl">Popolazione</div><input class="fi" id="tPop" type="number" placeholder="Es. 85000" min="0"/></div>
-        <div class="fg"><div class="fl">N° P.IVA</div><input class="fi" id="tPiva" type="number" placeholder="Es. 95" min="0"/></div>
-        <div class="fg full"><div class="fl">Incaricato assegnato</div><select class="fs" id="tInc"><option value="">— Nessuno —</option></select></div>
-        <div class="fg full"><div class="fl">Note</div><textarea class="fi" id="tNote" rows="3" placeholder="Note sul territorio..."></textarea></div>
-      </div>
-      <div class="slbl">Budget anni precedenti</div>
-      <div id="budgetRows"></div>
-      <button class="btn btns" style="margin-top:8px;font-size:11px" onclick="addBRow()">+ Aggiungi anno</button>
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTerritorioTitle">Nuovo territorio</div>
+      <button class="modal-close" onclick="closeModal('modalTerritorio')">✕</button>
     </div>
-    <div class="mf">
-      <button class="btn btns" onclick="closeM('mTerr')">Annulla</button>
-      <button class="btn btnp" onclick="salvaTerr()" id="btnSalvaTerr">Salva territorio</button>
+    <div class="modal-body">
+      <div class="fgrid">
+        <div class="fg full">
+          <div class="fl">Nome territorio *</div>
+          <input class="fi" id="tNome" placeholder="Es. Treviso"/>
+        </div>
+        <div class="fg">
+          <div class="fl">Regione</div>
+          <input class="fi" id="tRegione" placeholder="Es. Veneto"/>
+        </div>
+        <div class="fg">
+          <div class="fl">Provincia</div>
+          <input class="fi" id="tProvincia" placeholder="Es. TV"/>
+        </div>
+        <div class="fg">
+          <div class="fl">Numero abitanti</div>
+          <input class="fi" id="tAbitanti" type="number" placeholder="Es. 85000" min="0"/>
+        </div>
+        <div class="fg">
+          <div class="fl">Numero partite IVA</div>
+          <input class="fi" id="tPartiteIva" type="number" placeholder="Es. 4200" min="0"/>
+        </div>
+        <div class="fg full">
+          <div class="fl">Note</div>
+          <textarea class="fi" id="tNote" rows="3" placeholder="Note sul territorio..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modalTerritorio')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaTerritorioForm()" id="btnSalvaTerritorio">Salva territorio</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL SCHEDA -->
-<div class="mbg" id="mScheda">
-  <div class="modal" style="width:660px">
-    <div class="mh">
-      <div>
-        <div class="mt" id="schedaTit">—</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:2px" id="schedaSub">—</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btns" style="font-size:11px" id="btnEdit">Modifica</button>
-        <button class="mc" onclick="closeM('mScheda')">✕</button>
-      </div>
+<!-- ══ MODAL AGGIUNGI FASE PIPELINE ══ -->
+<div class="overlay" id="modalFase">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modalFaseTitle">Aggiungi alla pipeline</div>
+      <button class="modal-close" onclick="closeModal('modalFase')">✕</button>
     </div>
-    <div class="mb" style="padding:0">
-      <div class="sgrid" id="schedaGrid"></div>
-      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
-        <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Budget anni precedenti</div>
-        <div id="schedaBudget"><div class="empty" style="padding:12px">Nessun budget registrato</div></div>
-      </div>
-      <!-- DOCUMENTI -->
-      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Documenti</div>
-          <label style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:5px 10px;border:1px solid var(--bd2);border-radius:var(--r);cursor:pointer;transition:background .15s;background:var(--sur)" id="btnUploadDoc">
-            <svg viewBox="0 0 16 16" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M3 12h10"/></svg>
-            Carica file
-            <input type="file" id="docFileInput" style="display:none" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif" onchange="uploadDocumenti(this)"/>
-          </label>
-        </div>
-        <div id="schedaDocumenti"><div class="empty" style="padding:12px;font-size:11px">Nessun documento caricato</div></div>
-        <div id="uploadProgress" style="display:none;margin-top:8px">
-          <div style="background:var(--bd);border-radius:4px;height:4px;overflow:hidden">
-            <div id="uploadBar" style="height:100%;background:var(--wc);width:0%;transition:width .3s"></div>
-          </div>
-          <div style="font-size:10px;color:var(--tx3);margin-top:4px" id="uploadLabel">Caricamento...</div>
-        </div>
-      </div>
-      <!-- PIPELINE -->
-      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Pipeline contatto</div>
-          <button onclick="apriModalFase(schedaTerritoryId)" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:4px 9px;border:1px solid var(--bd2);border-radius:6px;cursor:pointer;background:var(--sur);font-family:var(--f)">
-            + Aggiungi fase
-          </button>
-        </div>
-        <div id="schedaPipeline"><div style="font-size:11px;color:var(--tx3);padding:6px 0">Nessuna fase registrata</div></div>
-      </div>
-
-      <!-- REFERENTI -->
-      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Referenti & Contatti</div>
-          <button onclick="apriModalReferente()" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:4px 9px;border:1px solid var(--bd2);border-radius:6px;cursor:pointer;background:var(--sur);font-family:var(--f)">
-            <svg viewBox="0 0 16 16" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M8 2v12M2 8h12"/></svg>
-            Aggiungi referente
-          </button>
-        </div>
-        <div id="schedaReferenti"><div class="empty" style="padding:12px;font-size:11px">Nessun referente registrato</div></div>
-      </div>
-      <!-- STORICO EDIZIONI -->
-      <div style="padding:14px 16px;border-top:1px solid var(--bd)">
-        <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Storico edizioni</div>
-        <div id="schedaStorico"><div class="empty" style="padding:12px;font-size:11px">Nessuna edizione registrata</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL PIPELINE -->
-<div class="mbg" id="mPipeline">
-  <div class="modal" style="width:480px">
-    <div class="mh">
-      <div class="mt" id="mPipelineTitle">Aggiungi fase pipeline</div>
-      <button class="mc" onclick="closeM('mPipeline')">✕</button>
-    </div>
-    <div class="mb">
+    <div class="modal-body">
       <div class="fg">
-        <div class="fl">Comune *</div>
-        <select class="fs" id="plComuneSel"><option value="">Seleziona...</option></select>
+        <div class="fl">Territorio *</div>
+        <select class="fs" id="fTerritorioId"></select>
       </div>
       <div class="fg">
         <div class="fl">Fase *</div>
-        <select class="fs" id="plFaseSel"></select>
+        <select class="fs" id="fFase">
+          <option value="da_contattare">Da contattare</option>
+          <option value="contattato">Contattato</option>
+          <option value="patrocinio_concesso">Patrocinio concesso</option>
+          <option value="patrocinio_negato">Patrocinio negato</option>
+          <option value="suolo_pubblico">Suolo pubblico</option>
+          <option value="location_selezionata">Location selezionata</option>
+        </select>
       </div>
       <div class="fg">
         <div class="fl">Data</div>
-        <input class="fi" id="plData" type="date"/>
+        <input class="fi" id="fData" type="date"/>
       </div>
       <div class="fg">
         <div class="fl">Note</div>
-        <textarea class="fi" id="plNote" rows="3" placeholder="Dettagli, contatti, accordi presi..."></textarea>
+        <textarea class="fi" id="fNote" rows="3" placeholder="Dettagli, accordi, contatti..."></textarea>
       </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
-        <input type="checkbox" id="plAttivo" checked style="width:15px;height:15px;accent-color:var(--wc)"/>
-        Fase attiva
-      </label>
     </div>
-    <div class="mf">
-      <button class="btn btns" onclick="closeM('mPipeline')">Annulla</button>
-      <button class="btn btnp" onclick="salvaFase()">Salva</button>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modalFase')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaFase()">Salva</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL REFERENTE -->
-<div class="mbg" id="mReferente">
-  <div class="modal" style="width:480px">
-    <div class="mh">
-      <div class="mt" id="mRefTitle">Nuovo referente</div>
-      <button class="mc" onclick="closeM('mReferente')">✕</button>
-    </div>
-    <div class="mb">
-      <div class="fgrid">
-        <div class="fg full"><div class="fl">Nome *</div><input class="fi" id="refNome" placeholder="Es. Mario Rossi"/></div>
-        <div class="fg"><div class="fl">Ruolo</div><input class="fi" id="refRuolo" placeholder="Es. Assessore, Segreteria..."/></div>
-        <div class="fg"><div class="fl">Data ultimo contatto</div><input class="fi" id="refDataContatto" type="date"/></div>
-        <div class="fg"><div class="fl">Telefono</div><input class="fi" id="refTel" type="tel" placeholder="+39 340 1234567"/></div>
-        <div class="fg"><div class="fl">Email</div><input class="fi" id="refEmail" type="email" placeholder="mario.rossi@comune.it"/></div>
-        <div class="fg full"><div class="fl">Note</div><textarea class="fi" id="refNote" rows="3" placeholder="Note sul referente, come contattarlo, orari..."></textarea></div>
-      </div>
-    </div>
-    <div class="mf">
-      <button class="btn btns" onclick="closeM('mReferente')">Annulla</button>
-      <button class="btn btnp" onclick="salvaReferente()">Salva referente</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ASSEGNAZIONE -->
-<div class="mbg" id="mAssegnazione">
-  <div class="modal" style="width:720px">
-    <div class="mh">
-      <div class="mt" id="mAssTitle">Nuova assegnazione</div>
-      <button class="mc" onclick="closeM('mAssegnazione')">✕</button>
-    </div>
-    <div class="mb">
-      <!-- Comuni selezionati -->
-      <div class="slbl">Comuni da assegnare</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <select class="fs" id="assComuneSel" style="flex:1">
-          <option value="">Seleziona comune...</option>
-        </select>
-        <button class="btn btns" onclick="aggiungiComuneAss()">+ Aggiungi</button>
-      </div>
-      <div id="assComuniScelti" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;min-height:32px">
-        <div style="font-size:11px;color:var(--tx3);padding:6px 0">Nessun comune selezionato</div>
-      </div>
-
-      <div class="fgrid">
-        <!-- Incaricato & Anno -->
-        <div class="fg"><div class="fl">Incaricato *</div><select class="fs" id="assIncaricatoSel" style="width:100%"><option value="">Seleziona...</option></select></div>
-        <div class="fg"><div class="fl">Anno *</div><select class="fs" id="assAnnoSel" style="width:100%"></select></div>
-
-        <!-- Modalità -->
-        <div class="fg full">
-          <div class="fl">Modalità evento</div>
-          <div style="display:flex;gap:8px">
-            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
-              <input type="radio" name="assModalita" value="patrocinio" checked style="accent-color:var(--wc)"/> 🏛️ Patrocinio comunale
-            </label>
-            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
-              <input type="radio" name="assModalita" value="suolo_pubblico" style="accent-color:var(--wc)"/> 🏙️ Suolo pubblico
-            </label>
-            <label style="flex:1;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r)">
-              <input type="radio" name="assModalita" value="location_privata" style="accent-color:var(--wc)"/> 🏢 Location privata
-            </label>
-          </div>
-        </div>
-        <div class="fg full"><div class="fl">Nome location (se privata)</div><input class="fi" id="assLocationNome" placeholder="Es. Centro Commerciale XYZ"/></div>
-
-        <!-- Date -->
-        <div class="fg"><div class="fl">Data patrocinio</div><input class="fi" id="assDataPatr" type="date"/></div>
-        <div class="fg"><div class="fl">Data evento prevista</div><input class="fi" id="assDataEvento" type="date"/></div>
-
-        <!-- Dettagli evento -->
-        <div class="fg"><div class="fl">Range d'età</div>
-          <select class="fs" id="assRangeEta" style="width:100%">
-            <option value="">— Seleziona —</option>
-            <option value="35-49">35-49</option>
-            <option value="35-45">35-45</option>
-            <option value="0-100 minori accomp.">0-100 (minori accompagnati)</option>
-            <option value="dai 40 anni">Dai 40 anni</option>
-            <option value="35-49 M+E / dai 40 per Prostata">35-49 M+E / dai 40 Prostata</option>
-            <option value="Aziendale">Aziendale</option>
-            <option value="da definire">Da definire</option>
-          </select>
-        </div>
-        <div class="fg"><div class="fl">Tipo evento</div>
-          <select class="fs" id="assTipoEvento" style="width:100%">
-            <option value="">— Seleziona —</option>
-            <option value="Mammo + Eco">Mammo + Eco</option>
-            <option value="M+E / Prostata">M+E / Prostata</option>
-            <option value="Prostata">Prostata</option>
-            <option value="Mappatura Nevi">Mappatura Nevi</option>
-            <option value="Tiroide">Tiroide</option>
-            <option value="Malattie Cardiovascolari">Malattie Cardiovascolari</option>
-            <option value="Misto">Misto</option>
-          </select>
-        </div>
-
-        <!-- Dicitura e inserire -->
-        <div class="fg full"><div class="fl">Dicitura del comune</div><input class="fi" id="assDicitura" placeholder="Es. Con il Patrocinio del Comune di..."/></div>
-        <div class="fg"><div class="fl">Inserire (logo/materiali)</div><input class="fi" id="assInserire" placeholder="Logo APS WelfareCare" value="Logo APS WelfareCare"/></div>
-        <div class="fg"><div class="fl">Partner sanitario</div><input class="fi" id="assPartner" placeholder="Es. RED CARE"/></div>
-
-        <!-- Stato -->
-        <div class="fg"><div class="fl">Stato</div>
-          <select class="fs" id="assStato" style="width:100%">
-            <option value="bozza">Bozza</option>
-            <option value="confermata">Confermata</option>
-            <option value="in_lavorazione">In lavorazione</option>
-            <option value="completata">Completata</option>
-          </select>
-        </div>
-
-        <!-- Note -->
-        <div class="fg full"><div class="fl">Note / Altro</div><textarea class="fi" id="assNote" rows="3" placeholder="Note operative, avvisi, istruzioni speciali..."></textarea></div>
-      </div>
-    </div>
-    <div class="mf">
-      <button class="btn btns" onclick="closeM('mAssegnazione')">Annulla</button>
-      <button class="btn btnp" onclick="salvaAssegnazione()" id="btnSalvaAss">Salva assegnazione</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL AGGIUNGI COMUNE AL PROGRAMMA -->
-<div class="mbg" id="mAddComune">
-  <div class="modal" style="width:560px">
-    <div class="mh"><div class="mt">Aggiungi comune al programma</div><button class="mc" onclick="closeM('mAddComune')">✕</button></div>
-    <div class="mb">
-      <div class="fgrid">
-        <div class="fg"><div class="fl">Anno *</div><select class="fs" id="acAnno" style="width:100%"></select></div>
-        <div class="fg"><div class="fl">Incaricato *</div><select class="fs" id="acIncaricato" style="width:100%"><option value="">Seleziona...</option></select></div>
-      </div>
-      <div class="fg"><div class="fl">Comune *</div>
-        <input class="fi" id="acComuneSearch" placeholder="Cerca comune..." oninput="filterAcComuni()" style="margin-bottom:6px"/>
-        <select class="fs" id="acComune" size="6" style="width:100%;height:130px"><option value="">Caricamento...</option></select>
-      </div>
-      <div class="fgrid">
-        <div class="fg"><div class="fl">Data evento prevista</div><input class="fi" id="acData" type="date"/></div>
-        <div class="fg"><div class="fl">Stato</div>
-          <select class="fs" id="acStato" style="width:100%">
-            <option value="pianificato">Pianificato</option>
-            <option value="in_corso">In corso</option>
-            <option value="completato">Completato</option>
-          </select>
-        </div>
-        <div class="fg full"><div class="fl">Note operative</div><textarea class="fi" id="acNote" rows="2" placeholder="Note, avvisi, dettagli..."></textarea></div>
-      </div>
-      <!-- Comuni assegnati suggeriti -->
-      <div id="acSuggeriti" style="display:none;margin-top:10px;padding:10px 12px;background:var(--wcl);border-radius:var(--r);font-size:11px;color:var(--wcd)">
-        <strong>💡 Comuni già assegnati a questo incaricato:</strong>
-        <div id="acSuggeritiList" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px"></div>
-      </div>
-    </div>
-    <div class="mf">
-      <button class="btn btns" onclick="closeM('mAddComune')">Annulla</button>
-      <button class="btn btnp" onclick="salvaAddComune()">Aggiungi al programma</button>
-    </div>
+<!-- ══ MODAL SCHEDA TERRITORIO ══ -->
+<div class="overlay" id="modalScheda">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-handle"></div>
+    <div id="schedaContent"></div>
   </div>
 </div>
 
 <script>
+const SB_URL = 'https://koshtsgvfqwuhoykfqai.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2h0c2d2ZnF3dWhveWtmcWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg4MTQsImV4cCI6MjA5MjI4NDgxNH0.6a9t7zCVwJX3eD1dv0E2d_dR9VUH4Ie7coEUvsRiRJU';
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
-// ── MAPPA ────────────────────────────────────────────
-let mappaInstance = null;
-let mappaAllData = [];
-let mappaInitialized = false;
+let user = null;
+let allTerritori = [];
+let allPipeline = [];
+let editTerrId = null;
+let editFaseId = null;
+let currentView = 'dashboard';
 
-const STATO_COLORS = {
-  'attivo': '#26ADE4', 'NO': '#ef4444', 'MAIL': '#f59e0b',
-  'ASSEGNATO': '#10b981', 'PATROCINIO': '#8b5cf6', 'SOSPESO': '#94a3b8',
-  'AGENTE': '#f97316', 'NO P.I.': '#64748b', 'PICCOLO': '#cbd5e1', 'default': '#94a3b8'
+const FASI = {
+  da_contattare:   { label: 'Da contattare',      color: '#64748b', bg: '#f1f5f9', cls: 'fase-da_contattare' },
+  contattato:      { label: 'Contattato',          color: '#f59e0b', bg: '#fef3c7', cls: 'fase-contattato' },
+  patrocinio_concesso: { label: 'Patrocinio ✓',   color: '#10b981', bg: '#d1fae5', cls: 'fase-patrocinio_concesso' },
+  patrocinio_negato:   { label: 'Patrocinio ✗',   color: '#ef4444', bg: '#fee2e2', cls: 'fase-patrocinio_negato' },
+  suolo_pubblico:  { label: 'Suolo pubblico',      color: '#8b5cf6', bg: '#ede9fe', cls: 'fase-suolo_pubblico' },
+  location_selezionata: { label: 'Location',       color: '#0ea5e9', bg: '#e0f2fe', cls: 'fase-location_selezionata' },
 };
 
-function getStatoColor(note) {
-  if (!note) return STATO_COLORS.default;
-  const n = note.replace('Stato: ','').trim().toUpperCase();
-  if (n === 'ATTIVO') return STATO_COLORS.attivo;
-  for (const key of Object.keys(STATO_COLORS)) {
-    if (n.includes(key.toUpperCase())) return STATO_COLORS[key];
-  }
-  return STATO_COLORS.default;
+// ── AUTH ──
+async function init(u) {
+  user = u;
+  const { data: profilo } = await sb.from('profili').select('*').eq('id', u.id).single();
+  const nome = profilo ? `${profilo.nome||''} ${profilo.cognome||''}`.trim() || u.email : u.email;
+  const ini = nome.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??';
+  document.getElementById('topAv').textContent = ini;
+  document.getElementById('topName').textContent = nome;
+  const ruoloLabels = { superadmin:'Super Admin', admin:'Admin', operatore:'Operatore', visualizzatore:'Visualizzatore' };
+  document.getElementById('sideRole').textContent = ruoloLabels[profilo?.ruolo] || profilo?.ruolo || '';
+  await Promise.all([loadTerritori(), loadPipeline()]);
+  loadDashboard();
 }
 
-function getStatoLabel(note) {
-  if (!note) return '—';
-  return note.replace('Stato: ','').trim();
-}
-
-async function initMappa() {
-  // Popola filtri
-  const regSel = document.getElementById('mapFilterReg');
-  const incSel = document.getElementById('mapFilterInc');
-  if (!regSel.options.length || regSel.options.length < 2) {
-    const regioni = [...new Set(allT.map(t=>t.regione).filter(Boolean))].sort();
-    regioni.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; regSel.appendChild(o); });
-    const incaricati = [...new Set(allT.map(t=>t.profili?`${t.profili.nome||''} ${t.profili.cognome||''}`.trim():'').filter(Boolean))].sort();
-    incaricati.forEach(i => { const o=document.createElement('option'); o.value=i; o.textContent=i; incSel.appendChild(o); });
-  }
-
-  if (mappaInitialized && mappaInstance) {
-    setTimeout(() => mappaInstance.invalidateSize(), 200);
-    return;
-  }
-
-  setTimeout(async () => {
-    mappaInstance = L.map('mapContainer').setView([45.5, 11.5], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-      maxZoom: 18
-    }).addTo(mappaInstance);
-
-    mappaInitialized = true;
-    await geocodificaEAggiungi();
-  }, 150);
-}
-
-async function geocodificaEAggiungi() {
-  const div = document.getElementById('mapCount');
-  div.textContent = 'Geocodifica in corso...';
-
-  const regionCenters = {
-    'Veneto':[45.43,12.33],'Lombardia':[45.46,9.19],'Piemonte':[45.07,7.69],
-    'Friuli-Venezia Giulia':[45.90,13.23],'Emilia-Romagna':[44.49,11.34],
-    'Toscana':[43.77,11.25],'Umbria':[43.11,12.39],'Puglia':[41.12,16.86],
-    'default':[45.46,9.19]
-  };
-
-  mappaAllData = [];
-  const coordsCache = {};
-  let processed = 0;
-
-  for (const t of allT) {
-    processed++;
-    if (processed % 10 === 0) {
-      div.textContent = `Caricamento ${processed}/${allT.length}...`;
-      await new Promise(r => setTimeout(r, 5));
-    }
-
-    const cacheKey = `${t.comune}|${t.provincia}`;
-    let coords = coordsCache[cacheKey];
-
-    if (!coords) {
-      try {
-        const q = encodeURIComponent(`${t.comune}, ${t.provincia}, Italia`);
-        const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=it`, {
-          headers: { 'Accept-Language': 'it', 'User-Agent': 'WelfareCare/1.0' }
-        });
-        const res = await resp.json();
-        if (res?.[0]) {
-          coords = [parseFloat(res[0].lat), parseFloat(res[0].lon)];
-        } else {
-          const c = regionCenters[t.regione] || regionCenters.default;
-          coords = [c[0] + (Math.random()-.5)*.4, c[1] + (Math.random()-.5)*.4];
-        }
-      } catch {
-        const c = regionCenters[t.regione] || regionCenters.default;
-        coords = [c[0] + (Math.random()-.5)*.4, c[1] + (Math.random()-.5)*.4];
-      }
-      coordsCache[cacheKey] = coords;
-      await new Promise(r => setTimeout(r, 1100)); // Nominatim rate limit
-    }
-
-    const color = getStatoColor(t.note);
-    const stato = getStatoLabel(t.note);
-    const incNome = t.profili ? `${t.profili.nome||''} ${t.profili.cognome||''}`.trim() : '';
-
-    const marker = L.circleMarker(coords, {
-      radius: 7, fillColor: color, color: '#fff',
-      weight: 1.5, opacity: 1, fillOpacity: 0.85
-    });
-
-    marker.bindPopup(`
-      <div style="font-weight:600;font-size:13px;color:#0d1117;margin-bottom:3px">${t.comune}</div>
-      <div style="color:#94a3b8;font-size:11px;margin-bottom:6px">${t.provincia} · ${t.regione}</div>
-      <span style="display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;margin-bottom:6px;background:${color}22;color:${color}">${stato}</span>
-      ${incNome ? `<div style="font-size:11px;color:#4a5568;margin-bottom:6px">👤 ${incNome}</div>` : ''}
-      <button onclick="apriSchedaDaMappa('${t.id}')" style="font-family:Poppins,sans-serif;font-size:11px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;border:1px solid #26ADE4;background:transparent;color:#26ADE4;width:100%">Apri scheda →</button>
-    `, { maxWidth: 220 });
-
-    marker._stato = stato;
-    marker._regione = t.regione;
-    marker._incaricato = incNome;
-    mappaAllData.push({ marker, t });
-  }
-
-  filterMappaMarkers();
-  div.textContent = `${allT.length} comuni caricati`;
-}
-
-function filterMappaMarkers() {
-  if (!mappaInstance) return;
-  const fs = document.getElementById('mapFilterStato').value.toLowerCase();
-  const fr = document.getElementById('mapFilterReg').value;
-  const fi = document.getElementById('mapFilterInc').value;
-  let count = 0;
-  mappaAllData.forEach(({ marker, t }) => {
-    const stato = (marker._stato || '').toLowerCase();
-    const ok = (!fs || stato.includes(fs)) && (!fr || t.regione === fr) && (!fi || marker._incaricato === fi);
-    if (ok) { if (!mappaInstance.hasLayer(marker)) marker.addTo(mappaInstance); count++; }
-    else { if (mappaInstance.hasLayer(marker)) mappaInstance.removeLayer(marker); }
-  });
-  document.getElementById('mapCount').textContent = `${count} comuni visibili`;
-}
-
-function apriSchedaDaMappa(id) {
-  mappaInstance.closePopup();
-  navTo('terr');
-  setTimeout(() => apriScheda(id), 300);
-}
-
-const SB_URL='https://koshtsgvfqwuhoykfqai.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvc2h0c2d2ZnF3dWhveWtmcWFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg4MTQsImV4cCI6MjA5MjI4NDgxNH0.6a9t7zCVwJX3eD1dv0E2d_dR9VUH4Ie7coEUvsRiRJU';
-const sb=supabase.createClient(SB_URL,SB_KEY);
-let user=null,profilo=null,editId=null,bRowN=0,allT=[],allP=[],curView='lista';
-
-async function logout(){
+async function logout() {
   await sb.auth.signOut();
   window.location.href = '/';
 }
 
-async function init(u){
-  user=u;
-  const{data:pr}=await sb.from('profili').select('*').eq('id',u.id).single();
-  profilo=pr;
-  const nome=pr?`${pr.nome||''} ${pr.cognome||''}`.trim()||u.email:u.email;
-  const ruolo=pr?.ruolo||'operatore';
-  const ini=nome.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'??';
-  ['topAv','sideAv'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini;});
-  const mobAv=document.getElementById('mobAv');if(mobAv)mobAv.textContent=ini;
-  document.getElementById('topName').textContent=nome;
-  const tr=document.getElementById('topRole');if(tr)tr.textContent=rlbl(ruolo);
-  const sn=document.getElementById('sideName');if(sn)sn.textContent=nome;
-  const sr=document.getElementById('sideRole');if(sr)sr.textContent=rlbl(ruolo);
-  const pe=document.getElementById('pEmail');if(pe)pe.value=u.email;
-  const pn=document.getElementById('pNome');if(pn)pn.value=pr?.nome||'';
-  const pc=document.getElementById('pCognome');if(pc)pc.value=pr?.cognome||'';
-  if(ruolo==='superadmin')document.querySelectorAll('.adm').forEach(el=>el.style.display='');
-  await loadP();await loadDash();await loadTerritori();
-  populateAnniSelect('prAnno');
-  populateAnniSelect('acAnno',true);
-}
-
-function rlbl(r){return{superadmin:'Super amministratore',supervisore:'Supervisore',operatore:'Operatore',visualizzatore:'Visualizzatore'}[r]||r;}
-
-async function loadP(){
-  const{data}=await sb.from('profili').select('id,nome,cognome').order('cognome');
-  allP=data||[];
-  const sel=document.getElementById('tInc');
-  sel.innerHTML='<option value="">— Nessuno —</option>';
-  allP.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nome||''} ${p.cognome||''}`.trim();sel.appendChild(o);});
-}
-
-function pName(id){const p=allP.find(x=>x.id===id);return p?`${p.nome||''} ${p.cognome||''}`.trim():'—';}
-
-async function loadDash(){
-  const{data}=await sb.from('territori').select('*,profili(nome,cognome)').order('created_at',{ascending:false});
-  if(!data)return;
-  allT=data;
-  const regs=[...new Set(data.map(t=>t.regione))];
-  const pop=data.reduce((s,t)=>s+(t.popolazione||0),0);
-  const piva=data.reduce((s,t)=>s+(t.numero_piva||0),0);
-  document.getElementById('kTot').textContent=data.length;
-  document.getElementById('kReg').textContent=regs.length;
-  document.getElementById('terrBadge').textContent=data.length;
-  const td=document.getElementById('terrDot');if(td){td.style.display=data.length>0?'block':'none';td.textContent=data.length;}
-  const tb=document.getElementById('dashTb');
-  tb.innerHTML=data.slice(0,8).map(t=>`<tr onclick="apriScheda('${t.id}')"><td><strong>${t.comune}</strong></td><td>${t.provincia}</td><td>${t.regione}</td><td>${t.cap||'—'}</td><td>${t.profili?`${t.profili.nome||''} ${t.profili.cognome||''}`.trim():'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Nessun territorio</td></tr>';
-  const dashMob=document.getElementById('dashMobList');
-  if(dashMob){
-    dashMob.innerHTML=data.slice(0,8).map(t=>{
-      const inc=t.profili?`${t.profili.nome||''} ${t.profili.cognome||''}`.trim():'';
-      return`<div class="mob-card" onclick="apriScheda('${t.id}')">
-        <div class="mc-title">${t.comune}</div>
-        <div class="mc-sub">${t.provincia} · ${t.regione}</div>
-        ${inc?`<div class="mc-tags"><span style="font-size:11px;color:var(--tx3)">👤 ${inc}</span></div>`:''}
-      </div>`;
-    }).join('');
-  }
-}
-
-async function loadTerritori(){
-  const{data}=await sb.from('territori').select('*,profili(nome,cognome)').order('regione').order('provincia').order('comune');
-  allT=data||[];
-  populateFilters();renderView();
-}
-
-function populateFilters(){
-  const regs=[...new Set(allT.map(t=>t.regione))].sort();
-  const rs=document.getElementById('fReg'),cv=rs.value;
-  rs.innerHTML='<option value="">Tutte le regioni</option>';
-  regs.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;rs.appendChild(o);});
-  rs.value=cv;updateProv();
-}
-
-function updateProv(){
-  const reg=document.getElementById('fReg').value;
-  const fl=reg?allT.filter(t=>t.regione===reg):allT;
-  const provs=[...new Set(fl.map(t=>t.provincia))].sort();
-  const ps=document.getElementById('fProv');
-  ps.innerHTML='<option value="">Tutte le province</option>';
-  provs.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;ps.appendChild(o);});
-}
-
-function getFiltered(){
-  const q=document.getElementById('tSearch').value.toLowerCase();
-  const reg=document.getElementById('fReg').value;
-  const prov=document.getElementById('fProv').value;
-  return allT.filter(t=>{
-    if(reg&&t.regione!==reg)return false;
-    if(prov&&t.provincia!==prov)return false;
-    if(q&&!t.comune.toLowerCase().includes(q)&&!t.provincia.toLowerCase().includes(q)&&!t.regione.toLowerCase().includes(q))return false;
-    return true;
-  });
-}
-
-function setView(v){
-  curView=v;
-  document.getElementById('vLista').classList.toggle('on',v==='lista');
-  document.getElementById('vGruppo').classList.toggle('on',v==='gruppo');
-  document.getElementById('vListaWrap').style.display=v==='lista'?'':'none';
-  document.getElementById('vGruppoWrap').style.display=v==='gruppo'?'':'none';
-  renderView();
-}
-
-function renderView(){curView==='lista'?renderLista():renderGruppo();}
-
-async function renderLista(){
-  const data=getFiltered();
-  const tc=document.getElementById('terrCount');if(tc)tc.textContent=`${data.length} comuni`;
-  const tb=document.getElementById('terrTb');
-  const mob=document.getElementById('terrMobList');
-  if(!data.length){
-    tb.innerHTML='<tr><td colspan="6" class="empty">Nessun risultato</td></tr>';
-    if(mob)mob.innerHTML='<div class="empty">Nessun risultato</div>';
-    return;
-  }
-  // Carica pipeline per questi territori
-  const ids=data.map(t=>t.id);
-  const {data:plRaw}=await sb.from('pipeline_territorio').select('territorio_id,fase').eq('attivo',true).in('territorio_id',ids);
-  const plMap={};
-  (plRaw||[]).forEach(p=>{if(!plMap[p.territorio_id])plMap[p.territorio_id]=[];plMap[p.territorio_id].push(p.fase);});
-  const FL={'da_contattare':'Da contattare','contattato':'Contattato','patrocinio_concesso':'Patrocinio ✓','patrocinio_negato':'Patrocinio ✗','suolo_pubblico_richiesto':'Suolo pubblico','location_selezionata':'Location'};
-  const FC={'da_contattare':'bk','contattato':'ba','patrocinio_concesso':'bg','patrocinio_negato':'br','suolo_pubblico_richiesto':'bb','location_selezionata':'bwc'};
-  // Desktop table
-  tb.innerHTML=data.map(t=>{
-    const fasi=plMap[t.id]||[];
-    const fasiHtml=fasi.length?fasi.map(f=>`<span class="bx ${FC[f]||'bk'}" style="font-size:9px;margin-right:2px">${FL[f]||f}</span>`).join(''):'<span style="color:var(--tx3);font-size:11px">—</span>';
-    return`<tr onclick="apriScheda('${t.id}')"><td><strong>${t.comune}</strong></td><td>${t.provincia}</td><td>${t.regione}</td><td>${t.cap||'—'}</td><td>${t.numero_piva||'—'}</td><td>${fasiHtml}</td></tr>`;
-  }).join('');
-  // Mobile cards
-  if(mob){
-    mob.innerHTML=data.map(t=>{
-      const fasi=plMap[t.id]||[];
-      return`<div class="mob-card" onclick="apriScheda('${t.id}')">
-        <div class="mc-title">${t.comune}</div>
-        <div class="mc-sub">${t.provincia} · ${t.regione}${t.cap?' · '+t.cap:''}</div>
-        <div class="mc-tags" style="margin-top:6px">
-          ${fasi.length?fasi.map(f=>`<span class="bx ${FC[f]||'bk'}" style="font-size:9px">${FL[f]||f}</span>`).join(''):'<span style="font-size:11px;color:var(--tx3)">Nessuna fase</span>'}
-        </div>
-      </div>`;
-    }).join('');
-  }
-}
-
-function renderGruppo(){
-  const data=getFiltered();
-  const c=document.getElementById('gruppoBody');
-  if(!data.length){c.innerHTML='<div class="empty">Nessun risultato</div>';return;}
-  const byR={};
-  data.forEach(t=>{if(!byR[t.regione])byR[t.regione]={};if(!byR[t.regione][t.provincia])byR[t.regione][t.provincia]=[];byR[t.regione][t.provincia].push(t);});
-  c.innerHTML=Object.entries(byR).map(([reg,provs])=>{
-    const tot=Object.values(provs).flat().length;
-    return`<div class="rblock">
-      <div class="rhdr" onclick="toggleBlk(this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
-        <span class="rn">${reg}</span>
-        <span class="rc">${tot} comuni · ${Object.keys(provs).length} province</span>
-      </div>
-      <div class="rc2">${Object.entries(provs).map(([prov,comuni])=>`
-        <div class="pblock">
-          <div class="phdr" onclick="toggleBlk(this)">
-            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
-            <span class="pn">${prov}</span>
-            <span style="font-size:10px;color:var(--tx3)">${comuni.length} comuni</span>
-          </div>
-          <div class="pc2">${comuni.map(t=>`
-            <div class="crow" onclick="apriScheda('${t.id}')">
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="#26ADE4" stroke-width="1.5"><circle cx="8" cy="6" r="2.5"/><path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z"/></svg>
-              <span class="cn">${t.comune}</span>
-              ${t.cap?`<span style="font-size:11px;color:var(--tx3)">${t.cap}</span>`:''}
-              ${t.popolazione?`<span class="chip">${t.popolazione.toLocaleString('it-IT')} ab.</span>`:''}
-              ${t.numero_piva?`<span class="chip">${t.numero_piva} P.IVA</span>`:''}
-              <span class="bx ${t.attivo?'bg':'ba'}" style="margin-left:auto">${t.attivo?'Attivo':'Inattivo'}</span>
-            </div>`).join('')}</div>
-        </div>`).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function toggleBlk(hdr){
-  const c=hdr.nextElementSibling;
-  const a=hdr.querySelector('svg');
-  const open=c.style.display!=='none';
-  c.style.display=open?'none':'';
-  a.style.transform=open?'rotate(-90deg)':'';
-}
-
-async function apriScheda(id){
-  const t=allT.find(x=>x.id===id);if(!t)return;
-  document.getElementById('schedaTit').textContent=t.comune;
-  document.getElementById('schedaSub').textContent=`${t.provincia} · ${t.regione}`;
-  document.getElementById('btnEdit').onclick=()=>{closeM('mScheda');editTerr(t);};
-  const inc=t.profili?`${t.profili.nome||''} ${t.profili.cognome||''}`.trim():'—';
-  document.getElementById('schedaGrid').innerHTML=`
-    <div class="sf2"><div class="slb">Comune</div><div class="sv big">${t.comune}</div></div>
-    <div class="sf2"><div class="slb">CAP</div><div class="sv big">${t.cap||'—'}</div></div>
-    <div class="sf2"><div class="slb">Provincia</div><div class="sv">${t.provincia}</div></div>
-    <div class="sf2"><div class="slb">Regione</div><div class="sv">${t.regione}</div></div>
-    <div class="sf2"><div class="slb">Popolazione</div><div class="sv">${t.popolazione?t.popolazione.toLocaleString('it-IT')+' ab.':'—'}</div></div>
-    <div class="sf2"><div class="slb">N° P.IVA</div><div class="sv">${t.numero_piva?t.numero_piva.toLocaleString('it-IT'):'—'}</div></div>
-    <div class="sf2 full"><div class="slb">Incaricato</div><div class="sv">${inc}</div></div>
-    <div class="sf2 full"><div class="slb">Stato</div><div class="sv"><span class="bx ${t.attivo?'bg':'ba'}">${t.attivo?'Attivo':'Inattivo'}</span></div></div>
-    ${t.note?`<div class="sf2 full"><div class="slb">Note</div><div class="sv">${t.note}</div></div>`:''}
-  `;
-  const{data:budget}=await sb.from('budget_territori').select('*').eq('territorio_id',id).order('anno',{ascending:false});
-  const bd=document.getElementById('schedaBudget');
-  if(!budget?.length){bd.innerHTML='<div class="empty" style="padding:12px">Nessun budget registrato</div>';}
-  else{
-    const mx=Math.max(...budget.map(b=>b.importo||0));
-    bd.innerHTML=budget.map(b=>`<div class="brow"><span class="banno">${b.anno}</span><div class="bbar"><div class="bfill" style="width:${mx>0?Math.round((b.importo/mx)*100):0}%"></div></div><span class="bimp">€ ${Number(b.importo).toLocaleString('it-IT')}</span></div>`).join('');
-  }
-  // Carica pipeline
-  await loadPipelineTerritorio(id);
-  // Carica referenti
-  await loadReferenti(id);
-  // Carica documenti
-  await loadDocumentiTerritorio(id);
-  // Carica storico edizioni
-  await loadStoricoEdizioni(id);
-  document.getElementById('mScheda').classList.add('on');
-}
-
-function openModalTerr(){
-  editId=null;bRowN=0;
-  document.getElementById('mTerrTitle').textContent='Nuovo territorio';
-  document.getElementById('btnSalvaTerr').textContent='Salva territorio';
-  ['tReg','tProv','tCom','tCap','tNote'].forEach(id=>document.getElementById(id).value='');
-  ['tPop','tPiva'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('tInc').value='';
-  document.getElementById('budgetRows').innerHTML='';
-  document.getElementById('mTerr').classList.add('on');
-}
-
-function editTerr(t){
-  editId=t.id;bRowN=0;
-  document.getElementById('mTerrTitle').textContent='Modifica — '+t.comune;
-  document.getElementById('btnSalvaTerr').textContent='Salva modifiche';
-  document.getElementById('tReg').value=t.regione||'';
-  document.getElementById('tProv').value=t.provincia||'';
-  document.getElementById('tCom').value=t.comune||'';
-  document.getElementById('tCap').value=t.cap||'';
-  document.getElementById('tPop').value=t.popolazione||'';
-  document.getElementById('tPiva').value=t.numero_piva||'';
-  document.getElementById('tInc').value=t.incaricato_id||'';
-  document.getElementById('tNote').value=t.note||'';
-  document.getElementById('budgetRows').innerHTML='';
-  sb.from('budget_territori').select('*').eq('territorio_id',t.id).order('anno').then(({data})=>{(data||[]).forEach(b=>addBRow(b.anno,b.importo));});
-  document.getElementById('mTerr').classList.add('on');
-}
-
-function addBRow(anno='',importo=''){
-  bRowN++;const id=bRowN;
-  const d=document.createElement('div');
-  d.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center';
-  d.id='br'+id;
-  d.innerHTML=`<input class="fi" style="margin:0" type="number" placeholder="Anno (es. 2024)" id="ba${id}" value="${anno}" min="2000" max="2100"/><input class="fi" style="margin:0" type="number" placeholder="Importo €" id="bi${id}" value="${importo}" min="0"/><button class="btn btns" style="padding:7px 10px" onclick="document.getElementById('br${id}').remove()">✕</button>`;
-  document.getElementById('budgetRows').appendChild(d);
-}
-
-async function salvaTerr(){
-  const reg=document.getElementById('tReg').value.trim();
-  const prov=document.getElementById('tProv').value.trim();
-  const com=document.getElementById('tCom').value.trim();
-  if(!reg||!prov||!com){toast('Regione, Provincia e Comune sono obbligatori','error');return;}
-  const payload={regione:reg,provincia:prov,comune:com,cap:document.getElementById('tCap').value.trim()||null,popolazione:parseInt(document.getElementById('tPop').value)||null,numero_piva:parseInt(document.getElementById('tPiva').value)||null,incaricato_id:document.getElementById('tInc').value||null,note:document.getElementById('tNote').value.trim()||null};
-  let tid=editId;
-  if(editId){
-    const{error}=await sb.from('territori').update(payload).eq('id',editId);
-    if(error){toast('Errore: '+error.message,'error');return;}
-  }else{
-    const{data,error}=await sb.from('territori').insert(payload).select().single();
-    if(error){toast('Errore: '+error.message,'error');return;}
-    tid=data.id;
-    await sb.from('attivita').insert({territorio_id:tid,utente_id:user.id,tipo:'territorio_creato',descrizione:`Territorio ${com} aggiunto`});
-  }
-  if(tid){
-    await sb.from('budget_territori').delete().eq('territorio_id',tid);
-    const ins=[];
-    for(let i=1;i<=bRowN+5;i++){
-      const ae=document.getElementById('ba'+i),ie=document.getElementById('bi'+i);
-      if(!ae||!ie)continue;
-      const a=parseInt(ae.value),imp=parseFloat(ie.value);
-      if(a&&!isNaN(imp))ins.push({territorio_id:tid,anno:a,importo:imp});
-    }
-    if(ins.length)await sb.from('budget_territori').insert(ins);
-  }
-  toast(editId?'Territorio aggiornato':'Territorio aggiunto','success');
-  closeM('mTerr');
-  await loadTerritori();await loadDash();
-}
-
-async function loadUtenti(){
-  const{data}=await sb.from('profili').select('*').order('cognome');
-  const tb=document.getElementById('utTb');
-  if(!data?.length){tb.innerHTML='<tr><td colspan="4" class="empty">Nessun utente</td></tr>';return;}
-  tb.innerHTML=data.map(u=>`<tr><td>${u.nome||''} ${u.cognome||''}</td><td>${rbadge(u.ruolo)}</td><td><span class="bx ${u.attivo?'bg':'ba'}">${u.attivo?'Attivo':'Inattivo'}</span></td><td><button class="btn btns" style="font-size:10px;padding:3px 8px" onclick="toggleAtt('${u.id}',${u.attivo})">${u.attivo?'Disattiva':'Attiva'}</button></td></tr>`).join('');
-}
-
-async function creaUtente(){
-  const email=document.getElementById('iEmail').value.trim(),pwd=document.getElementById('iPwd').value;
-  const nome=document.getElementById('iNome').value.trim(),cognome=document.getElementById('iCognome').value.trim();
-  const ruolo=document.getElementById('iRuolo').value;
-  if(!email||!pwd){toast('Email e password obbligatori','error');return;}
-  const{data,error}=await sb.auth.signUp({email,password:pwd});
-  if(error){toast('Errore: '+error.message,'error');return;}
-  if(data?.user)await sb.from('profili').upsert({id:data.user.id,nome,cognome,ruolo});
-  toast('Account creato — conferma email richiesta','success');
-  ['iEmail','iPwd','iNome','iCognome'].forEach(id=>document.getElementById(id).value='');
-}
-
-async function toggleAtt(id,att){await sb.from('profili').update({attivo:!att}).eq('id',id);toast(att?'Disattivato':'Attivato','success');await loadUtenti();}
-
-async function salvaProfilo(){
-  const nome=document.getElementById('pNome').value.trim(),cognome=document.getElementById('pCognome').value.trim();
-  const pwd=document.getElementById('pPwd').value;
-  await sb.from('profili').upsert({id:user.id,nome,cognome});
-  if(pwd)await sb.auth.updateUser({password:pwd});
-  toast('Profilo aggiornato','success');
-}
-
-function rbadge(r){return{superadmin:'<span class="bx bwc">Super admin</span>',supervisore:'<span class="bx bb">Supervisore</span>',operatore:'<span class="bx bk">Operatore</span>',visualizzatore:'<span class="bx" style="background:#f1efe8;color:#5f5e5a">Visualizzatore</span>'}[r]||r;}
-
-// ── STORICO EDIZIONI ─────────────────────────────────
-async function loadStoricoEdizioni(territorioId) {
-  const div = document.getElementById('schedaStorico');
-  div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Caricamento...</div>';
-
-  // Carica assegnazioni per questo territorio
-  const { data: ass } = await sb.from('assegnazioni')
-    .select('*, profili(nome,cognome)')
-    .eq('territorio_id', territorioId)
-    .order('anno', { ascending: false });
-
-  // Carica anche programma (vecchio sistema)
-  const { data: prog } = await sb.from('programma')
-    .select('*, profili(nome,cognome)')
-    .eq('territorio_id', territorioId)
-    .order('anno', { ascending: false });
-
-  const statoLabels = { bozza:'Bozza', confermata:'Confermata', in_lavorazione:'In lavorazione', completata:'Completata', pianificato:'Pianificato', in_corso:'In corso' };
-  const statoColors = { completata:'bg', confermata:'bb', in_lavorazione:'ba', bozza:'bk', pianificato:'bk', in_corso:'ba' };
-
-  const items = [];
-
-  // Aggiungi assegnazioni
-  (ass||[]).forEach(a => {
-    const inc = a.profili ? `${a.profili.nome||''} ${a.profili.cognome||''}`.trim() : '—';
-    items.push({
-      anno: a.anno,
-      inc,
-      tipo: a.tipo_evento || '—',
-      stato: a.stato,
-      note: a.note,
-      data_evento: a.data_evento,
-      modalita: a.modalita,
-      source: 'assegnazione'
-    });
-  });
-
-  // Aggiungi da programma se non già presente
-  (prog||[]).forEach(p => {
-    if (!items.find(i => i.anno === p.anno)) {
-      const inc = p.profili ? `${p.profili.nome||''} ${p.profili.cognome||''}`.trim() : '—';
-      items.push({ anno: p.anno, inc, tipo: p.note||'—', stato: p.stato, note: null, source: 'programma' });
-    }
-  });
-
-  // Carica anche budget storico
-  const { data: budget } = await sb.from('budget_territori')
-    .select('anno, importo')
-    .eq('territorio_id', territorioId)
-    .order('anno', { ascending: false });
-
-  const budgetByAnno = {};
-  (budget||[]).forEach(b => { budgetByAnno[b.anno] = b.importo; });
-
-  if (!items.length && !budget?.length) {
-    div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Nessuna edizione registrata</div>';
-    return;
-  }
-
-  // Raggruppa tutti gli anni noti
-  const tuttiAnni = [...new Set([...items.map(i=>i.anno), ...Object.keys(budgetByAnno).map(Number)])].sort((a,b)=>b-a);
-
-  div.innerHTML = tuttiAnni.map(anno => {
-    const item = items.find(i => i.anno === anno);
-    const budget = budgetByAnno[anno];
-    const statoLbl = item ? (statoLabels[item.stato] || item.stato) : null;
-    const statoCls = item ? (statoColors[item.stato] || 'bk') : null;
-
-    return `<div style="border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden">
-      <!-- Header anno -->
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--sur2);cursor:pointer" onclick="toggleStoricoAnno(this)">
-        <div style="width:40px;font-weight:700;font-size:13px;color:var(--tx);flex-shrink:0">${anno}</div>
-        <div style="flex:1;min-width:0">
-          ${item ? `
-            <div style="font-size:12px;font-weight:500;color:var(--tx)">${item.tipo}${item.inc !== '—' ? ` · <span style="color:var(--tx3);font-weight:400">${item.inc}</span>` : ''}</div>
-            ${item.data_evento ? `<span style="font-size:10px;color:var(--tx3)">📅 ${new Date(item.data_evento).toLocaleDateString('it-IT')}</span>` : ''}
-          ` : '<span style="font-size:11px;color:var(--tx3)">Solo budget registrato</span>'}
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-          ${statoLbl ? `<span class="bx ${statoCls}" style="font-size:10px">${statoLbl}</span>` : ''}
-          ${budget ? `<span style="font-size:11px;font-weight:600;color:var(--wcd)">€ ${Number(budget).toLocaleString('it-IT')}</span>` : ''}
-          <span style="color:var(--tx3);font-size:14px;margin-left:4px">›</span>
-        </div>
-      </div>
-      <!-- Body anno (collassato) -->
-      <div style="display:none;padding:12px 14px">
-        ${item?.note ? `<div style="font-size:11px;color:var(--tx2);margin-bottom:10px;font-style:italic">📝 ${item.note}</div>` : ''}
-        <!-- Documenti edizione -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em">Documenti edizione ${anno}</div>
-          <label style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:4px 9px;border:1px solid var(--bd2);border-radius:6px;cursor:pointer;background:var(--sur)">
-            <svg viewBox="0 0 16 16" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M3 12h10"/></svg>
-            Carica
-            <input type="file" style="display:none" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif" onchange="uploadDocumentoEdizione(this,'${territorioId}',${anno})"/>
-          </label>
-        </div>
-        <div id="docs-${territorioId}-${anno}" style="min-height:28px">
-          <div style="font-size:11px;color:var(--tx3)">Caricamento...</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('') + '<div style="height:4px"></div>';
-}
-
-// ── PIPELINE IN SCHEDA ───────────────────────────────
-async function loadPipelineTerritorio(territorioId) {
-  const div = document.getElementById('schedaPipeline');
-  if (!div) return;
-  div.innerHTML = '<div style="font-size:11px;color:var(--tx3)">Caricamento...</div>';
-
-  const { data } = await sb.from('pipeline_territorio')
-    .select('*')
-    .eq('territorio_id', territorioId)
-    .order('created_at', { ascending: false });
-
-  if (!data?.length) {
-    div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:4px 0">Nessuna fase registrata</div>';
-    return;
-  }
-
-  const FL = {'da_contattare':'Da contattare','contattato':'Contattato','patrocinio_concesso':'Patrocinio concesso','patrocinio_negato':'Patrocinio negato','suolo_pubblico_richiesto':'Suolo pubblico richiesto','location_selezionata':'Location selezionata'};
-  const FC = {'da_contattare':'#94a3b8','contattato':'#f59e0b','patrocinio_concesso':'#10b981','patrocinio_negato':'#ef4444','suolo_pubblico_richiesto':'#8b5cf6','location_selezionata':'#26ADE4'};
-  const FB = {'da_contattare':'#f1f5f9','contattato':'#fef3c7','patrocinio_concesso':'#d1fae5','patrocinio_negato':'#fee2e2','suolo_pubblico_richiesto':'#ede9fe','location_selezionata':'#e8f6fc'};
-
-  div.innerHTML = data.map(p => `
-    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
-      <span style="display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;flex-shrink:0;background:${FB[p.fase]||'#f1f5f9'};color:${FC[p.fase]||'#94a3b8'}">${FL[p.fase]||p.fase}</span>
-      <div style="flex:1;min-width:0">
-        ${p.data_fase ? `<div style="font-size:10px;color:var(--tx3)">📅 ${new Date(p.data_fase).toLocaleDateString('it-IT')}</div>` : ''}
-        ${p.note ? `<div style="font-size:11px;color:var(--tx2);margin-top:2px">${p.note}</div>` : ''}
-        ${!p.attivo ? `<div style="font-size:10px;color:var(--tx3);margin-top:2px;font-style:italic">Archiviata</div>` : ''}
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        <button onclick="apriModalFase('${territorioId}',null,'${p.id}')" style="background:none;border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:6px;font-family:var(--f)">✏️</button>
-        <button onclick="eliminaFase('${p.id}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px">✕</button>
-      </div>
-    </div>`).join('') + '<div style="height:4px"></div>';
-}
-
-// ── REFERENTI TERRITORIO ─────────────────────────────
-let refEditId = null;
-let refTerritoryId = null;
-
-function apriModalReferente(editId = null) {
-  refEditId = editId;
-  document.getElementById('mRefTitle').textContent = editId ? 'Modifica referente' : 'Nuovo referente';
-  if (!editId) {
-    ['refNome','refRuolo','refTel','refEmail','refNote','refDataContatto'].forEach(id => document.getElementById(id).value = '');
-  }
-  document.getElementById('mReferente').classList.add('on');
-}
-
-async function salvaReferente() {
-  const nome = document.getElementById('refNome').value.trim();
-  if (!nome) { toast('Il nome è obbligatorio', 'error'); return; }
-  if (!refTerritoryId) return;
-
-  const payload = {
-    territorio_id: refTerritoryId,
-    nome,
-    ruolo: document.getElementById('refRuolo').value.trim() || null,
-    telefono: document.getElementById('refTel').value.trim() || null,
-    email: document.getElementById('refEmail').value.trim() || null,
-    note: document.getElementById('refNote').value.trim() || null,
-    data_ultimo_contatto: document.getElementById('refDataContatto').value || null,
-  };
-
-  if (refEditId) {
-    await sb.from('referenti_territorio').update(payload).eq('id', refEditId);
-  } else {
-    await sb.from('referenti_territorio').insert(payload);
-  }
-
-  toast(refEditId ? 'Referente aggiornato' : 'Referente aggiunto', 'success');
-  closeM('mReferente');
-  await loadReferenti(refTerritoryId);
-}
-
-async function loadReferenti(territorioId) {
-  refTerritoryId = territorioId;
-  const div = document.getElementById('schedaReferenti');
-  div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:6px 0">Caricamento...</div>';
-
-  const { data } = await sb.from('referenti_territorio')
-    .select('*')
-    .eq('territorio_id', territorioId)
-    .order('created_at', { ascending: false });
-
-  if (!data?.length) {
-    div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Nessun referente registrato</div>';
-    return;
-  }
-
-  div.innerHTML = data.map(r => `
-    <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)">
-      <div style="width:34px;height:34px;border-radius:50%;background:var(--wcl);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--wcd);flex-shrink:0">
-        ${r.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:600;color:var(--tx)">${r.nome}</div>
-        ${r.ruolo ? `<div style="font-size:10px;font-weight:500;color:var(--wcd);background:var(--wcl);display:inline-block;padding:1px 7px;border-radius:20px;margin-top:2px">${r.ruolo}</div>` : ''}
-        <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">
-          ${r.telefono ? `<a href="tel:${r.telefono}" style="font-size:11px;color:var(--tx2);text-decoration:none;display:flex;align-items:center;gap:3px">📞 ${r.telefono}</a>` : ''}
-          ${r.email ? `<a href="mailto:${r.email}" style="font-size:11px;color:var(--wc);text-decoration:none;display:flex;align-items:center;gap:3px">✉️ ${r.email}</a>` : ''}
-          ${r.data_ultimo_contatto ? `<span style="font-size:11px;color:var(--tx3)">🗓️ Ultimo contatto: ${new Date(r.data_ultimo_contatto).toLocaleDateString('it-IT')}</span>` : ''}
-        </div>
-        ${r.note ? `<div style="font-size:11px;color:var(--tx3);margin-top:5px;font-style:italic">${r.note}</div>` : ''}
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        <button onclick="modificaReferente('${r.id}')" style="background:none;border:1px solid var(--bd2);color:var(--tx3);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:6px;font-family:var(--f)">✏️</button>
-        <button onclick="eliminaReferente('${r.id}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px">✕</button>
-      </div>
-    </div>`).join('') + '<div style="height:4px"></div>';
-}
-
-async function modificaReferente(id) {
-  const { data } = await sb.from('referenti_territorio').select('*').eq('id', id).single();
-  if (!data) return;
-  refEditId = id;
-  document.getElementById('mRefTitle').textContent = 'Modifica referente';
-  document.getElementById('refNome').value = data.nome || '';
-  document.getElementById('refRuolo').value = data.ruolo || '';
-  document.getElementById('refTel').value = data.telefono || '';
-  document.getElementById('refEmail').value = data.email || '';
-  document.getElementById('refNote').value = data.note || '';
-  document.getElementById('refDataContatto').value = data.data_ultimo_contatto || '';
-  document.getElementById('mReferente').classList.add('on');
-}
-
-async function eliminaReferente(id) {
-  if (!confirm('Eliminare questo referente?')) return;
-  await sb.from('referenti_territorio').delete().eq('id', id);
-  toast('Referente eliminato', 'success');
-  await loadReferenti(refTerritoryId);
-}
-
-// ── STORICO ANNO TOGGLE & UPLOAD ─────────────────────
-function toggleStoricoAnno(header) {
-  const body = header.nextElementSibling;
-  const arrow = header.querySelector('span:last-child');
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  arrow.textContent = isOpen ? '›' : '⌄';
-  // Carica documenti se si apre per la prima volta
-  if (!isOpen) {
-    const input = body.querySelector('input[type="file"]');
-    if (input) {
-      const onchange = input.getAttribute('onchange');
-      const match = onchange?.match(/uploadDocumentoEdizione\(this,'([^']+)',(\d+)\)/);
-      if (match) loadDocumentiEdizione(match[1], parseInt(match[2]));
-    }
-  }
-}
-
-async function loadDocumentiEdizione(territorioId, anno) {
-  const div = document.getElementById(`docs-${territorioId}-${anno}`);
-  if (!div) return;
-  
-  const { data } = await sb.from('documenti_territorio')
-    .select('*')
-    .eq('territorio_id', territorioId)
-    .eq('anno', anno)
-    .order('created_at', { ascending: false });
-
-  if (!data?.length) {
-    div.innerHTML = '<div style="font-size:11px;color:var(--tx3);padding:4px 0">Nessun documento per questa edizione</div>';
-    return;
-  }
-
-  div.innerHTML = data.map(d => {
-    const ext = (d.nome||'').split('.').pop().toLowerCase();
-    const icon = ext==='pdf'?'📄':['xls','xlsx'].includes(ext)?'📊':['doc','docx'].includes(ext)?'📝':['jpg','jpeg','png','gif'].includes(ext)?'🖼️':'📎';
-    const size = d.dimensione?(d.dimensione>1024*1024?(d.dimensione/1024/1024).toFixed(1)+' MB':Math.round(d.dimensione/1024)+' KB'):'';
-    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">
-      <span style="font-size:15px">${icon}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.nome}</div>
-        <div style="font-size:10px;color:var(--tx3)">${size} · ${new Date(d.created_at).toLocaleDateString('it-IT')}</div>
-      </div>
-      <button onclick="apriDocumento('${d.storage_path}')" style="padding:3px 8px;font-size:10px;border:1px solid var(--bd2);border-radius:5px;color:var(--wc);background:none;cursor:pointer;font-family:var(--f)">Apri</button>
-      <button onclick="eliminaDocumentoEdizione('${d.id}','${d.storage_path}','${territorioId}',${anno})" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:13px;padding:1px 4px">✕</button>
-    </div>`;
-  }).join('') + '<div style="height:2px"></div>';
-}
-
-async function uploadDocumentoEdizione(input, territorioId, anno) {
-  if (!input.files?.length) return;
-  const files = [...input.files];
-  
-  for (const file of files) {
-    const path = `${territorioId}/${anno}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-    const { error: upErr } = await sb.storage.from('documenti-territori').upload(path, file, { upsert: false });
-    if (upErr) { toast(`Errore: ${file.name}`, 'error'); continue; }
-    await sb.from('documenti_territorio').insert({
-      territorio_id: territorioId,
-      nome: file.name,
-      tipo: file.type,
-      dimensione: file.size,
-      storage_path: path,
-      url_pubblico: null,
-      anno: anno,
-      categoria: 'edizione',
-      caricato_da: (await sb.auth.getUser()).data.user?.id || null,
-    });
-  }
-  
-  input.value = '';
-  toast(`${files.length} file caricati`, 'success');
-  await loadDocumentiEdizione(territorioId, anno);
-}
-
-async function eliminaDocumentoEdizione(id, path, territorioId, anno) {
-  if (!confirm('Eliminare questo documento?')) return;
-  await sb.storage.from('documenti-territori').remove([path]);
-  await sb.from('documenti_territorio').delete().eq('id', id);
-  toast('Eliminato', 'success');
-  await loadDocumentiEdizione(territorioId, anno);
-}
-
-// ── DOCUMENTI TERRITORIO ────────────────────────────
-let schedaTerritoryId = null;
-
-async function loadDocumentiTerritorio(territorioId) {
-  schedaTerritoryId = territorioId;
-  const div = document.getElementById('schedaDocumenti');
-  div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Caricamento...</div>';
-  
-  const { data, error } = await sb.from('documenti_territorio')
-    .select('*')
-    .eq('territorio_id', territorioId)
-    .order('created_at', { ascending: false });
-  
-  if (!data?.length) {
-    div.innerHTML = '<div class="empty" style="padding:12px;font-size:11px">Nessun documento caricato</div>';
-    return;
-  }
-  
-  div.innerHTML = data.map(d => {
-    const ext = (d.nome || '').split('.').pop().toLowerCase();
-    const icon = ext === 'pdf' ? '📄' : ['xls','xlsx'].includes(ext) ? '📊' : ['doc','docx'].includes(ext) ? '📝' : ['jpg','jpeg','png','gif'].includes(ext) ? '🖼️' : '📎';
-    const size = d.dimensione ? (d.dimensione > 1024*1024 ? (d.dimensione/1024/1024).toFixed(1)+' MB' : Math.round(d.dimensione/1024)+' KB') : '';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
-      <span style="font-size:18px;flex-shrink:0">${icon}</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.nome}</div>
-        <div style="font-size:10px;color:var(--tx3)">${size} · ${new Date(d.created_at).toLocaleDateString('it-IT')}</div>
-      </div>
-      <button onclick="apriDocumento('${d.storage_path}')" style="padding:4px 8px;font-size:11px;border:1px solid var(--bd2);border-radius:6px;color:var(--wc);background:none;cursor:pointer;flex-shrink:0;font-family:var(--f)">Apri</button>
-      <button onclick="eliminaDocumento('${d.id}','${d.storage_path}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px" title="Elimina">✕</button>
-    </div>`;
-  }).join('') + '<div style="height:1px"></div>';
-}
-
-async function uploadDocumenti(input) {
-  if (!input.files?.length || !schedaTerritoryId) return;
-  const files = [...input.files];
-  const progress = document.getElementById('uploadProgress');
-  const bar = document.getElementById('uploadBar');
-  const label = document.getElementById('uploadLabel');
-  progress.style.display = 'block';
-  
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    label.textContent = `Caricamento ${file.name}...`;
-    bar.style.width = Math.round(((i) / files.length) * 100) + '%';
-    
-    const ext = file.name.split('.').pop();
-    const path = `${schedaTerritoryId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-    
-    const { data: upData, error: upErr } = await sb.storage
-      .from('documenti-territori')
-      .upload(path, file, { upsert: false });
-    
-    if (upErr) {
-      toast(`Errore caricamento ${file.name}: ${upErr.message}`, 'error');
-      continue;
-    }
-    
-    // Salva solo il path — URL firmato generato al momento dell'apertura
-    await sb.from('documenti_territorio').insert({
-      territorio_id: schedaTerritoryId,
-      nome: file.name,
-      tipo: file.type,
-      dimensione: file.size,
-      storage_path: path,
-      url_pubblico: null,
-      caricato_da: (await sb.auth.getUser()).data.user?.id || null,
-    });
-  }
-  
-  bar.style.width = '100%';
-  label.textContent = `${files.length} file caricati`;
-  setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 2000);
-  input.value = '';
-  toast(`${files.length} documento/i caricato/i`, 'success');
-  await loadDocumentiTerritorio(schedaTerritoryId);
-}
-
-async function apriDocumento(path) {
-  // Genera URL firmato valido 1 ora
-  const { data, error } = await sb.storage
-    .from('documenti-territori')
-    .createSignedUrl(path, 3600);
-  if (error || !data?.signedUrl) {
-    toast('Errore apertura documento', 'error');
-    return;
-  }
-  window.open(data.signedUrl, '_blank');
-}
-
-async function eliminaDocumento(id, path) {
-  if (!confirm('Eliminare questo documento?')) return;
-  await sb.storage.from('documenti-territori').remove([path]);
-  await sb.from('documenti_territorio').delete().eq('id', id);
-  toast('Documento eliminato', 'success');
-  await loadDocumentiTerritorio(schedaTerritoryId);
-}
-
-function toast(msg,type=''){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast '+(type||'');t.style.display='block';
-  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3200);
-}
-
-function closeM(id){document.getElementById(id).classList.remove('on');}
-
-
-document.getElementById('fReg').addEventListener('change',()=>{updateProv();renderView();});
-
-
-// ─── PROGRAMMA ────────────────────────────────────────
-let dragSrc = null;
-
-async function apriModalAggiuntaProgramma() {
-  populateAnniSelect('acAnno');
-  populateIncaricatiSelect('acIncaricato');
-  // Popola tutti i comuni
-  const sel = document.getElementById('acComune');
-  sel.innerHTML = '';
-  [...allT].sort((a,b)=>a.comune.localeCompare(b.comune)).forEach(t => {
-    const o = document.createElement('option');
-    o.value = t.id;
-    o.textContent = `${t.comune} (${t.provincia})`;
-    o.dataset.comune = t.comune.toLowerCase();
-    o.dataset.provincia = t.provincia.toLowerCase();
-    sel.appendChild(o);
-  });
-  document.getElementById('acComuneSearch').value = '';
-  document.getElementById('acNote').value = '';
-  document.getElementById('acData').value = '';
-  document.getElementById('acStato').value = 'pianificato';
-  document.getElementById('acSuggeriti').style.display = 'none';
-  document.getElementById('mAddComune').classList.add('on');
-}
-
-function filterAcComuni() {
-  const q = document.getElementById('acComuneSearch').value.toLowerCase();
-  const opts = document.getElementById('acComune').options;
-  for (const o of opts) {
-    o.style.display = (!q || o.dataset.comune?.includes(q) || o.dataset.provincia?.includes(q)) ? '' : 'none';
-  }
-}
-
-// Quando cambia incaricato, mostra suggerimenti assegnazioni
-document.addEventListener('change', async (e) => {
-  if (e.target.id !== 'acIncaricato') return;
-  const incId = e.target.value;
-  const anno = parseInt(document.getElementById('acAnno').value);
-  const suggDiv = document.getElementById('acSuggeriti');
-  const suggList = document.getElementById('acSuggeritiList');
-  if (!incId) { suggDiv.style.display = 'none'; return; }
-
-  const { data } = await sb.from('assegnazioni')
-    .select('*, territori(comune,provincia)')
-    .eq('incaricato_id', incId)
-    .eq('anno', anno)
-    .in('stato', ['confermata','in_lavorazione','completata']);
-
-  if (!data?.length) { suggDiv.style.display = 'none'; return; }
-
-  suggDiv.style.display = 'block';
-  suggList.innerHTML = data.map(a => `
-    <span onclick="selezionaComuneSuggerito('${a.territorio_id}')"
-      style="cursor:pointer;background:var(--wc);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:500">
-      ${a.territori?.comune} (${a.territori?.provincia})
-    </span>`).join('');
-});
-
-function selezionaComuneSuggerito(terrId) {
-  const sel = document.getElementById('acComune');
-  sel.value = terrId;
-}
-
-async function salvaAddComune() {
-  const anno = parseInt(document.getElementById('acAnno').value);
-  const incId = document.getElementById('acIncaricato').value;
-  const terrId = document.getElementById('acComune').value;
-  const stato = document.getElementById('acStato').value;
-  const note = document.getElementById('acNote').value.trim();
-  const data_evento = document.getElementById('acData').value || null;
-  if (!terrId || !incId) { toast('Seleziona incaricato e comune','error'); return; }
-
-  // Verifica se già presente
-  const { data: ex } = await sb.from('programma')
-    .select('id').eq('anno', anno).eq('incaricato_id', incId).eq('territorio_id', terrId);
-  if (ex?.length) { toast('Questo comune è già nel programma','error'); return; }
-
-  const { data: last } = await sb.from('programma')
-    .select('ordine').eq('anno', anno).eq('incaricato_id', incId)
-    .order('ordine',{ascending:false}).limit(1);
-  const nextOrdine = last?.length ? last[0].ordine + 1 : 1;
-
-  const { error } = await sb.from('programma').insert({
-    territorio_id: terrId, incaricato_id: incId, anno,
-    ordine: nextOrdine, stato, note: note||null,
-    data_evento
-  });
-  if (error) { toast('Errore: '+error.message,'error'); return; }
-  toast('Comune aggiunto al programma','success');
-  closeM('mAddComune');
-  await loadProgramma();
-}
-
-async function loadProgramma() {
-  const annoSel = document.getElementById('prAnno');
-  const incSel = document.getElementById('prIncaricato');
-  if (!annoSel.options.length) populateAnniSelect('prAnno');
-  if (incSel.options.length <= 1) populateIncaricatiSelect('prIncaricato');
-
-  const anno = parseInt(annoSel.value) || new Date().getFullYear();
-  const incId = incSel.value;
-
-  let q = sb.from('programma')
-    .select('*, territori(comune,provincia,regione,cap,note), profili(nome,cognome)')
-    .eq('anno', anno).order('ordine');
-  if (incId) q = q.eq('incaricato_id', incId);
-  const { data } = await q;
-
-  document.getElementById('prBadge').textContent = data?.length || 0;
-  const pbm=document.getElementById('prBadgeMob');if(pbm)pbm.textContent=data?.length>0?data.length:'';
-  const body = document.getElementById('programmaBody');
-  if (!data?.length) {
-    body.innerHTML = '<div class="empty">Nessun comune nel programma per questo anno.<br><br><button class="btn btnp" onclick="apriModalAggiuntaProgramma()">+ Aggiungi il primo comune</button></div>';
-    return;
-  }
-
-  // Raggruppa per incaricato
-  const byInc = {};
-  data.forEach(r => {
-    const k = r.incaricato_id || '__nessuno__';
-    if (!byInc[k]) byInc[k] = { profilo: r.profili, items: [] };
-    byInc[k].items.push(r);
-  });
-
-  body.innerHTML = Object.entries(byInc).map(([incId, grp]) => {
-    const nome = grp.profilo ? `${grp.profilo.nome||''} ${grp.profilo.cognome||''}`.trim() : 'Senza incaricato';
-    const ini = nome.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    return `<div class="inc-block">
-      <div class="inc-hdr">
-        <div class="inc-av">${ini}</div>
-        <div class="inc-name">${nome}</div>
-        <div class="inc-count">${grp.items.length} comuni · Anno ${anno}</div>
-      </div>
-      <div class="drag-list" data-inc="${incId}" data-anno="${anno}">
-        ${grp.items.map((r,i) => programmaItem(r, i+1)).join('')}
-      </div>
-    </div>`;
-  }).join('');
-
-  document.querySelectorAll('.drag-item').forEach(initDrag);
-}
-
-function programmaItem(r, n) {
-  const t = r.territori;
-  const sp = statoClass(r.stato);
-  const slbl = statoLabel(r.stato);
-  const dataEvento = r.data_evento ? new Date(r.data_evento).toLocaleDateString('it-IT') : null;
-  const tipoEvento = r.note ? r.note.replace(/^[📋🆕]\s*/,'').split('·')[0].trim() : null;
-  const modalita = '';
-
-  return `<div class="drag-item" draggable="true" data-id="${r.id}">
-    <span class="drag-handle">⠿</span>
-    <div class="drag-num">${n}</div>
-    <div class="drag-info">
-      <div class="drag-comune">${modalita} ${t?.comune||'—'}</div>
-      <div class="drag-sub">
-        ${t?.provincia||''} · ${t?.regione||''}
-        ${dataEvento ? `· 📅 ${dataEvento}` : ''}
-        ${tipoEvento ? `· ${tipoEvento}` : ''}
-      </div>
-      ${r.note ? `<div style="font-size:10px;color:var(--tx3);margin-top:2px;font-style:italic">${r.note}</div>` : ''}
-    </div>
-    <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
-      <button class="stato-pill ${sp}" onclick="cycleStato('${r.id}','${r.stato}')">${slbl}</button>
-    </div>
-    <div class="drag-actions">
-      <button class="btn btns" style="font-size:10px;padding:3px 8px" onclick="modificaItemProgramma('${r.id}')">✏️</button>
-      <button class="btn btns" style="font-size:10px;padding:3px 8px;color:#a32d2d" onclick="rimuoviDaProgramma('${r.id}')">✕</button>
-    </div>
-  </div>`;
-}
-
-async function modificaItemProgramma(id) {
-  const { data } = await sb.from('programma').select('*,territori(comune,provincia)').eq('id',id).single();
-  if (!data) return;
-  // Usa un prompt semplice per modificare data e note
-  const nuovaData = prompt(`Data evento per ${data.territori?.comune}:`, data.data_evento||'');
-  if (nuovaData === null) return;
-  const nuoveNote = prompt('Note operative:', data.note||'');
-  if (nuoveNote === null) return;
-  await sb.from('programma').update({
-    data_evento: nuovaData || null,
-    note: nuoveNote || null
-  }).eq('id', id);
-  toast('Aggiornato','success');
-  await loadProgramma();
-}
-
-function statoClass(s){return{pianificato:'sp-pian',in_corso:'sp-corso',completato:'sp-comp'}[s]||'sp-pian';}
-function statoLabel(s){return{pianificato:'Pianificato',in_corso:'In corso',completato:'Completato'}[s]||s;}
-
-function initDrag(el){
-  el.addEventListener('dragstart',e=>{dragSrc=el;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
-  el.addEventListener('dragend',()=>{dragSrc=null;document.querySelectorAll('.drag-item').forEach(i=>i.classList.remove('dragging','drag-over'));});
-  el.addEventListener('dragover',e=>{e.preventDefault();if(dragSrc&&dragSrc!==el){document.querySelectorAll('.drag-item').forEach(i=>i.classList.remove('drag-over'));el.classList.add('drag-over');}});
-  el.addEventListener('drop',async e=>{
-    e.preventDefault();
-    if(!dragSrc||dragSrc===el)return;
-    const list=el.closest('.drag-list');
-    const items=[...list.querySelectorAll('.drag-item')];
-    const fromIdx=items.indexOf(dragSrc);
-    const toIdx=items.indexOf(el);
-    if(fromIdx===toIdx)return;
-    list.insertBefore(dragSrc,fromIdx<toIdx?el.nextSibling:el);
-    await saveOrder(list);
-  });
-}
-
-async function saveOrder(list){
-  const items=[...list.querySelectorAll('.drag-item')];
-  for(const[i,el]of items.entries()){
-    await sb.from('programma').update({ordine:i+1}).eq('id',el.dataset.id);
-  }
-  items.forEach((el,i)=>{const n=el.querySelector('.drag-num');if(n)n.textContent=i+1;});
-  toast('Ordine salvato','success');
-}
-
-async function cycleStato(id,stato){
-  const next={pianificato:'in_corso',in_corso:'completato',completato:'pianificato'};
-  await sb.from('programma').update({stato:next[stato]||'pianificato'}).eq('id',id);
-  await loadProgramma();
-}
-
-async function rimuoviDaProgramma(id){
-  if(!confirm('Rimuovere questo comune dal programma?'))return;
-  await sb.from('programma').delete().eq('id',id);
-  toast('Rimosso','success');
-  await loadProgramma();
-}
-
-async function generaProgramma() {
-  const incId = document.getElementById('prIncaricato').value;
-  const anno = parseInt(document.getElementById('prAnno').value) || new Date().getFullYear();
-  
-  if (!incId) { toast('Seleziona prima un incaricato', 'error'); return; }
-
-  const incNome = document.getElementById('prIncaricato').options[document.getElementById('prIncaricato').selectedIndex].text;
-  
-  // Verifica se esiste già un programma
-  const { data: esistente } = await sb.from('programma')
-    .select('id').eq('anno', anno).eq('incaricato_id', incId);
-  
-  if (esistente?.length) {
-    if (!confirm(`Esiste già un programma per ${incNome} nel ${anno} con ${esistente.length} comuni.\nVuoi svuotarlo e rigenerarlo?`)) return;
-    await sb.from('programma').delete().eq('anno', anno).eq('incaricato_id', incId);
-  }
-
-  const btn = document.getElementById('btnGeneraProgramma');
-  btn.textContent = 'Generazione...'; btn.disabled = true;
-
-  try {
-    // STEP 1: Carica storico edizioni passate (programma anni precedenti)
-    const { data: storico } = await sb.from('programma')
-      .select('territorio_id, anno, territori(comune,provincia,regione)')
-      .eq('incaricato_id', incId)
-      .lt('anno', anno)
-      .order('anno', { ascending: false });
-
-    // Conta quante volte ogni comune è stato lavorato
-    const conteggioStorico = {};
-    (storico || []).forEach(r => {
-      const tid = r.territorio_id;
-      if (!conteggioStorico[tid]) conteggioStorico[tid] = { count: 0, territorio: r.territori };
-      conteggioStorico[tid].count++;
-    });
-
-    // STEP 2: Carica assegnazioni confermate per quest'anno
-    const { data: assegnazioni } = await sb.from('assegnazioni')
-      .select('territorio_id, tipo_evento, data_evento, modalita, range_eta, note, territori(comune,provincia,regione)')
-      .eq('incaricato_id', incId)
-      .eq('anno', anno)
-      .in('stato', ['confermata', 'in_lavorazione', 'completata']);
-
-    const assegnazioniMap = {};
-    (assegnazioni || []).forEach(a => { assegnazioniMap[a.territorio_id] = a; });
-
-    // STEP 3: Costruisci lista ordinata
-    // Prima: comuni storici (ordinati per numero edizioni desc)
-    const comuniStorici = Object.entries(conteggioStorico)
-      .sort(([,a],[,b]) => b.count - a.count)
-      .map(([tid, info]) => ({
-        territorio_id: tid,
-        fonte: 'storico',
-        edizioni: info.count,
-        assegnazione: assegnazioniMap[tid] || null,
-        territorio: info.territorio
-      }));
-
-    // Poi: assegnazioni nuove (non nello storico)
-    const comuniNuovi = Object.entries(assegnazioniMap)
-      .filter(([tid]) => !conteggioStorico[tid])
-      .map(([tid, ass]) => ({
-        territorio_id: tid,
-        fonte: 'assegnazione',
-        edizioni: 0,
-        assegnazione: ass,
-        territorio: ass.territori
-      }));
-
-    const tuttiComuni = [...comuniStorici, ...comuniNuovi];
-
-    if (!tuttiComuni.length) {
-      toast('Nessun dato disponibile per generare il programma. Aggiungi assegnazioni o storico prima.', 'error');
-      btn.textContent = 'Genera programma'; btn.disabled = false;
-      return;
-    }
-
-    // STEP 4: Inserisci nel programma
-    const inserts = tuttiComuni.map((c, i) => ({
-      territorio_id: c.territorio_id,
-      incaricato_id: incId,
-      anno,
-      ordine: i + 1,
-      stato: 'pianificato',
-      data_evento: c.assegnazione?.data_evento || null,
-      note: c.fonte === 'storico'
-        ? `📋 ${c.edizioni} edizione${c.edizioni>1?'i':''} precedent${c.edizioni>1?'i':'e'}${c.assegnazione ? ' · Assegnato ' + anno : ''}`
-        : `🆕 Prima assegnazione ${anno}`,
-    }));
-
-    const { error } = await sb.from('programma').insert(inserts);
-    if (error) { toast('Errore: ' + error.message, 'error'); return; }
-
-    toast(`✅ Programma generato: ${comuniStorici.length} comuni storici + ${comuniNuovi.length} nuovi`, 'success');
-    await loadProgramma();
-
-  } finally {
-    btn.textContent = 'Genera programma'; btn.disabled = false;
-  }
-}
-
-function exportProgrammaPDF(){
-  toast('Export PDF — prossimamente','');
-}
-
-function populateAnniSelect(selId,withAll=false){
-  const sel=document.getElementById(selId);if(!sel)return;
-  const curr=new Date().getFullYear();
-  const years=[curr-2,curr-1,curr,curr+1,curr+2];
-  sel.innerHTML=withAll?'<option value="">Tutti gli anni</option>':'';
-  years.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;if(y===curr)o.selected=true;sel.appendChild(o);});
-}
-
-function populateIncaricatiSelect(selId){
-  const sel=document.getElementById(selId);if(!sel)return;
-  const curr=sel.value;
-  sel.innerHTML='<option value="">Tutti gli incaricati</option>';
-  allP.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.nome||''} ${p.cognome||''}`.trim();sel.appendChild(o);});
-  sel.value=curr;
-}
-
-function populateComuniSelect(selId){
-  const sel=document.getElementById(selId);if(!sel)return;
-  sel.innerHTML='<option value="">Seleziona comune...</option>';
-  [...allT].sort((a,b)=>a.comune.localeCompare(b.comune)).forEach(t=>{
-    const o=document.createElement('option');o.value=t.id;o.textContent=`${t.comune} (${t.provincia})`;sel.appendChild(o);
-  });
-}
-
-// ─── ARCHIVIO ─────────────────────────────────────────
-async function loadArchivio() {
-  const anno = document.getElementById('archAnno').value;
-  const incId = document.getElementById('archIncaricato').value;
-  const q2 = document.getElementById('archSearch').value.toLowerCase();
-
-  let q = sb.from('archivio').select('*, profili!archivio_incaricato_id_fkey(nome,cognome)').order('anno', {ascending:false}).order('ordine_originale');
-  if (anno) q = q.eq('anno', parseInt(anno));
-  if (incId) q = q.eq('incaricato_id', incId);
-  const { data } = await q;
-
-  const filtered = (data||[]).filter(r => !q2 || (r.comune_nome||'').toLowerCase().includes(q2) || (r.provincia_nome||'').toLowerCase().includes(q2));
-  const body = document.getElementById('archivioBody');
-
-  if (!filtered.length) { body.innerHTML = '<div class="empty">Nessun comune in archivio.</div>'; return; }
-
-  // Raggruppa per anno
-  const byAnno = {};
-  filtered.forEach(r => {
-    if (!byAnno[r.anno]) byAnno[r.anno] = [];
-    byAnno[r.anno].push(r);
-  });
-
-  body.innerHTML = Object.entries(byAnno).sort(([a],[b])=>b-a).map(([anno, items]) => `
-    <div class="arch-year-block">
-      <div class="arch-year-hdr" onclick="toggleBlk(this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
-        <span class="arch-year-lbl">Edizione ${anno}</span>
-        <span class="arch-year-cnt">${items.length} comuni</span>
-      </div>
-      <div class="arch-year-body">
-        <div class="card" style="margin:0 0 4px 0">
-          <div class="ts">
-            <table class="tbl">
-              <thead><tr><th>#</th><th>Comune</th><th>Provincia</th><th>Regione</th><th>CAP</th><th>Incaricato</th><th></th></tr></thead>
-              <tbody>
-                ${items.map(r => {
-                  const nome = r.profili ? `${r.profili.nome||''} ${r.profili.cognome||''}`.trim() : '—';
-                  return `<tr>
-                    <td style="color:var(--tx3)">${r.ordine_originale||'—'}</td>
-                    <td><strong>${r.comune_nome||'—'}</strong></td>
-                    <td>${r.provincia_nome||'—'}</td>
-                    <td>${r.regione_nome||'—'}</td>
-                    <td>${r.cap||'—'}</td>
-                    <td>${r.popolazione?r.popolazione.toLocaleString('it-IT'):'—'}</td>
-                    <td>${r.numero_piva||'—'}</td>
-                    <td>${nome}</td>
-                    <td>
-                      <button class="btn btns" style="font-size:10px;padding:3px 8px;white-space:nowrap" onclick="ripristina('${r.id}')">↩ Ripristina</button>
-                    </td>
-                  </tr>`;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-async function ripristina(archId) {
-  if (!confirm('Ripristinare questo comune nel programma attivo?')) return;
-  const { data: r } = await sb.from('archivio').select('*').eq('id', archId).single();
-  if (!r) return;
-  const anno = new Date().getFullYear();
-  const { data: ex } = await sb.from('programma').select('ordine').eq('anno', anno).eq('incaricato_id', r.incaricato_id).order('ordine',{ascending:false}).limit(1);
-  const nextOrd = ex?.length ? ex[0].ordine+1 : 1;
-  await sb.from('programma').insert({ territorio_id: r.territorio_id, incaricato_id: r.incaricato_id, anno, ordine: nextOrd, stato:'pianificato', note: r.note });
-  await sb.from('archivio').delete().eq('id', archId);
-  toast('Comune ripristinato nel programma '+anno, 'success');
-  await loadArchivio();
-}
-
-(async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){
-    await init(session.user);
-  } else {
-    window.location.href='/';
-  }
-})();
-
-// ── MOBILE FAB ────────────────────────────────────────
-const FAB_ACTIONS = {
-  pipeline: ()=>apriModalFase(),
-  terr: ()=>openModalTerr(),
-  assegnazioni: ()=>apriModalAssegnazione(),
-  programma: ()=>apriModalAggiuntaProgramma(),
+// ── NAVIGATION ──
+const VIEW_CONFIG = {
+  dashboard: { title: 'Dashboard', subtitle: 'Panoramica attività', fab: false },
+  territori: { title: 'Territori', subtitle: 'Anagrafica comuni', fab: true, fabAction: ()=>openModalTerritorio() },
+  pipeline: { title: 'Pipeline', subtitle: 'Gestione contatti', fab: true, fabAction: ()=>openModalFase() },
 };
-let currentSection = 'dash';
+
+function showView(id) {
+  currentView = id;
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+id));
+  document.querySelectorAll('.nav-item, .bn-btn').forEach(n => n.classList.toggle('active', n.dataset.view === id));
+  const cfg = VIEW_CONFIG[id] || {};
+  document.getElementById('pageTitle').textContent = cfg.title || id;
+  document.getElementById('pageSubtitle').textContent = cfg.subtitle || '';
+  const fab = document.getElementById('fab');
+  fab.style.display = cfg.fab ? 'flex' : 'none';
+  const actions = document.getElementById('pageActions');
+  if (id === 'territori') {
+    actions.innerHTML = '<button class="btn btn-primary" onclick="openModalTerritorio()"><svg viewBox="0 0 16 16" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M8 2v12M2 8h12"/></svg>Nuovo territorio</button>';
+  } else if (id === 'pipeline') {
+    actions.innerHTML = '<button class="btn btn-primary" onclick="openModalFase()"><svg viewBox="0 0 16 16" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M8 2v12M2 8h12"/></svg>Aggiungi fase</button>';
+  } else {
+    actions.innerHTML = '';
+  }
+  document.getElementById('uMenu').classList.remove('on');
+}
 
 function fabAction() {
-  const fn = FAB_ACTIONS[currentSection];
-  if (fn) fn();
+  const cfg = VIEW_CONFIG[currentView];
+  if (cfg?.fabAction) cfg.fabAction();
 }
 
-// ── NAV ───────────────────────────────────────────────
-const NAV = {
-  dash:'Dashboard', terr:'Territori', pipeline:'Pipeline contatti', mappa:'Mappa',
-  assegnazioni:'Assegnazioni', programma:'Programma'
-};
-
-function navTo(id) {
-  currentSection = id;
-  document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on', n.dataset.s===id));
-  document.querySelectorAll('.bn-btn').forEach(n=>n.classList.toggle('on', n.dataset.s===id));
-  document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on', s.id==='s-'+id));
-  const title = NAV[id]||id;
-  document.getElementById('ttl').textContent = title;
-  
-  // Subbar actions
-  const actions = document.getElementById('subbarActions');
-  if (id==='terr') actions.innerHTML = '';
-  if (id==='pipeline') actions.innerHTML = '<button class="btn btnp" onclick="apriModalFase()" style="font-size:12px">+ Aggiungi fase</button>';
-  else if (id==='assegnazioni') actions.innerHTML = '<button class="btn btnp" onclick="apriModalAssegnazione()" style="font-size:12px">+ Nuova assegnazione</button>';
-  else if (id==='programma') actions.innerHTML = '<button class="btn btns" onclick="apriModalAggiuntaProgramma()" style="font-size:11px">+ Aggiungi comune</button>';
-  else actions.innerHTML = '';
-  
-  // FAB
-  const fab = document.getElementById('fabBtn');
-  if (fab) fab.style.display = FAB_ACTIONS[id] ? 'flex' : 'none';
-  
-  document.getElementById('uMenu').classList.remove('on');
-  if (id==='terr') renderView();
-  if (id==='programma') loadProgramma();
-  if (id==='assegnazioni') loadAssegnazioni();
-  if (id==='mappa') initMappa();
-}
-
-function toggleMenu() { document.getElementById('uMenu').classList.toggle('on'); }
 function handleSearch(q) {
-  if (document.getElementById('s-terr').classList.contains('on')) {
-    document.getElementById('tSearch').value = q;
-    renderView();
-  }
+  document.getElementById('terrSearch').value = q;
+  filterTerritori();
 }
-document.querySelectorAll('.mbg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
-document.addEventListener('click', e => {
-  if (!e.target.closest('.tn-u') && !e.target.closest('.tb-user')) {
-    const menu = document.getElementById('uMenu');
-    if (menu) menu.classList.remove('on');
-  }
-});
 
-// ── LOGOUT ────────────────────────────────────────────
-
-
-// ── SESSION ───────────────────────────────────────────
-// ─── ASSEGNAZIONI ────────────────────────────────────
-let assEditId = null;
-let assComuniScelti = [];
-
-function apriModalAssegnazione(editId = null) {
-  assEditId = editId;
-  assComuniScelti = [];
-  document.getElementById('mAssTitle').textContent = editId ? 'Modifica assegnazione' : 'Nuova assegnazione';
-  populateIncaricatiSelect('assIncaricatoSel');
-  populateAnniSelect('assAnnoSel');
-  const sel = document.getElementById('assComuneSel');
-  sel.innerHTML = '<option value="">Seleziona comune...</option>';
-  [...allT].sort((a,b)=>a.comune.localeCompare(b.comune)).forEach(t => {
-    const o = document.createElement('option');
-    o.value = t.id; o.textContent = `${t.comune} (${t.provincia})`;
-    sel.appendChild(o);
+// ── TERRITORI ──
+async function loadTerritori() {
+  const { data } = await sb.from('territori').select('*').order('nome');
+  allTerritori = data || [];
+  // Populate regione filter
+  const regioni = [...new Set(allTerritori.map(t=>t.regione).filter(Boolean))].sort();
+  ['terrRegione','plRegione'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const curr = sel.value;
+    sel.innerHTML = '<option value="">Tutte le regioni</option>';
+    regioni.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
+    sel.value = curr;
   });
-  ['assDataPatr','assDataEvento','assLocationNome','assDicitura','assNote','assPartner'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value = '';
+  document.getElementById('badgeTerritori').textContent = allTerritori.length;
+  renderTerritori();
+}
+
+function getFasiPerTerritorio() {
+  const map = {};
+  allPipeline.forEach(p => {
+    if (!map[p.territorio_id]) map[p.territorio_id] = [];
+    map[p.territorio_id].push(p);
   });
-  const ins = document.getElementById('assInserire');
-  if(ins) ins.value = 'Logo APS WelfareCare';
-  const re = document.getElementById('assRangeEta'); if(re) re.value = '';
-  const te = document.getElementById('assTipoEvento'); if(te) te.value = '';
-  const st = document.getElementById('assStato'); if(st) st.value = 'bozza';
-  const radPub = document.querySelector('input[name="assModalita"][value="patrocinio"]');
-  if(radPub) radPub.checked = true;
-  renderAssComuniScelti();
-  document.getElementById('mAssegnazione').classList.add('on');
+  return map;
 }
 
-function aggiungiComuneAss() {
-  const sel = document.getElementById('assComuneSel');
-  const id = sel.value; if(!id) return;
-  if(assComuniScelti.find(c=>c.id===id)){toast('Comune già aggiunto','error');return;}
-  const t = allT.find(x=>x.id===id); if(!t) return;
-  assComuniScelti.push({id:t.id,comune:t.comune,provincia:t.provincia});
-  sel.value = '';
-  renderAssComuniScelti();
-  const dic = document.getElementById('assDicitura');
-  if(dic && !dic.value && assComuniScelti.length===1)
-    dic.value = `Con il Patrocinio del Comune di ${t.comune} (${t.provincia})`;
-}
-
-function renderAssComuniScelti() {
-  const div = document.getElementById('assComuniScelti');
-  if(!div) return;
-  if(!assComuniScelti.length){
-    div.innerHTML='<div style="font-size:11px;color:var(--tx3);padding:6px 0">Nessun comune selezionato</div>';
+function renderTerritori() {
+  const q = document.getElementById('terrSearch')?.value.toLowerCase() || '';
+  const reg = document.getElementById('terrRegione')?.value || '';
+  const fasiMap = getFasiPerTerritorio();
+  const filtered = allTerritori.filter(t => {
+    if (reg && t.regione !== reg) return false;
+    if (q && !t.nome?.toLowerCase().includes(q) && !t.provincia?.toLowerCase().includes(q) && !t.regione?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('terrCount').textContent = `${filtered.length} territori`;
+  const tbody = document.getElementById('terrTable');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7">
+      <div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"/></svg></div>
+        <div class="empty-title">Nessun territorio</div>
+        <div class="empty-desc">Aggiungi il primo territorio per iniziare</div>
+        <button class="btn btn-primary" onclick="openModalTerritorio()">+ Nuovo territorio</button>
+      </div>
+    </td></tr>`;
     return;
   }
-  div.innerHTML = assComuniScelti.map(c=>`
-    <span style="display:inline-flex;align-items:center;gap:5px;background:var(--wcl);color:var(--wcd);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500">
-      ${c.comune} (${c.provincia})
-      <button onclick="rimuoviComuneAss('${c.id}')" style="background:none;border:none;color:var(--wcd);cursor:pointer;font-size:12px;padding:0;line-height:1">✕</button>
-    </span>`).join('');
-}
-
-function rimuoviComuneAss(id) {
-  assComuniScelti = assComuniScelti.filter(c=>c.id!==id);
-  renderAssComuniScelti();
-}
-
-async function salvaAssegnazione() {
-  if(!assComuniScelti.length){toast('Seleziona almeno un comune','error');return;}
-  const incId = document.getElementById('assIncaricatoSel').value;
-  const anno = parseInt(document.getElementById('assAnnoSel').value);
-  if(!incId){toast('Seleziona un incaricato','error');return;}
-  const modalita = document.querySelector('input[name="assModalita"]:checked')?.value||'patrocinio';
-  const btn = document.getElementById('btnSalvaAss');
-  if(btn){btn.textContent='Salvo...';btn.disabled=true;}
-  const basePayload = {
-    incaricato_id:incId, anno, modalita,
-    location_nome:document.getElementById('assLocationNome')?.value.trim()||null,
-    data_patrocinio:document.getElementById('assDataPatr')?.value||null,
-    data_evento:document.getElementById('assDataEvento')?.value||null,
-    range_eta:document.getElementById('assRangeEta')?.value||null,
-    tipo_evento:document.getElementById('assTipoEvento')?.value||null,
-    dicitura_comune:document.getElementById('assDicitura')?.value.trim()||null,
-    inserire:document.getElementById('assInserire')?.value.trim()||null,
-    partner:document.getElementById('assPartner')?.value.trim()||null,
-    stato:document.getElementById('assStato')?.value||'bozza',
-    note:document.getElementById('assNote')?.value.trim()||null,
-    creato_da:user?.id,
-  };
-  let errors=[];
-  for(const c of assComuniScelti){
-    const{error}=await sb.from('assegnazioni').insert({...basePayload,territorio_id:c.id});
-    if(error) errors.push(c.comune);
-  }
-  if(btn){btn.textContent='Salva assegnazione';btn.disabled=false;}
-  if(errors.length){toast(`Errore su: ${errors.join(', ')}`,'error');return;}
-  toast(`${assComuniScelti.length} assegnazion${assComuniScelti.length===1?'e':'i'} salvat${assComuniScelti.length===1?'a':'e'}`,'success');
-  closeM('mAssegnazione');
-  await loadAssegnazioni();
-}
-
-async function loadAssegnazioni() {
-  const annSel = document.getElementById('assFilterAnno');
-  if(annSel && annSel.options.length<2) populateAnniSelect('assFilterAnno',true);
-  populateIncaricatiSelect('assFilterInc');
-  const anno = document.getElementById('assFilterAnno')?.value;
-  const incId = document.getElementById('assFilterInc')?.value;
-  const stato = document.getElementById('assFilterStato')?.value;
-  const q = document.getElementById('assSearch')?.value.toLowerCase()||'';
-  let query = sb.from('assegnazioni')
-    .select('*, territori(comune,provincia,regione,cap,note), profili(nome,cognome)')
-    .order('created_at',{ascending:false});
-  if(anno) query=query.eq('anno',parseInt(anno));
-  if(incId) query=query.eq('incaricato_id',incId);
-  if(stato) query=query.eq('stato',stato);
-  const{data}=await query;
-  let filtered=(data||[]);
-  if(q) filtered=filtered.filter(a=>(a.territori?.comune||'').toLowerCase().includes(q)||(a.territori?.provincia||'').toLowerCase().includes(q));
-  const badge=document.getElementById('assBadge');
-  if(badge) badge.textContent=filtered.length;
-  const dot=document.getElementById('assDot');
-  if(dot){dot.style.display=filtered.length>0?'block':'none';dot.textContent=filtered.length;}
-  const body=document.getElementById('assBody');
-  if(!body)return;
-  if(!filtered.length){body.innerHTML='<div class="empty">Nessuna assegnazione trovata.<br>Clicca "+ Nuova assegnazione" per iniziare.</div>';return;}
-  const modLabels={patrocinio:'🏛️ Patrocinio',suolo_pubblico:'🏙️ Suolo pubblico',location_privata:'🏢 Location privata'};
-  const statoLabels={bozza:'Bozza',confermata:'Confermata',in_lavorazione:'In lavorazione',completata:'Completata'};
-  body.innerHTML=filtered.map(a=>{
-    const t=a.territori;
-    const inc=a.profili?`${a.profili.nome||''} ${a.profili.cognome||''}`.trim():'—';
-    const mod=a.modalita?(modLabels[a.modalita]||a.modalita):'—';
-    const locNome=a.location_nome?` — ${a.location_nome}`:'';
-    const statoLabel=statoLabels[a.stato]||a.stato;
-    return`<div class="ass-card">
-      <div class="ass-head" onclick="toggleAssCard(this)">
-        <div style="flex:1">
-          <div class="ass-comune">${t?.comune||'—'} <span style="font-size:12px;color:var(--tx3);font-weight:400">(${t?.provincia||'—'})</span></div>
-          <div class="ass-meta">${a.anno} · ${inc} · ${mod}${locNome}</div>
+  tbody.innerHTML = filtered.map(t => {
+    const fasi = fasiMap[t.id] || [];
+    const fasiHtml = fasi.length
+      ? fasi.slice(0,2).map(f => `<span class="badge ${FASI[f.fase]?.cls||'badge-gray'}" style="font-size:10px">${FASI[f.fase]?.label||f.fase}</span>`).join(' ') + (fasi.length>2?` <span style="font-size:10px;color:var(--tx3)">+${fasi.length-2}</span>`:'')
+      : '<span style="font-size:11px;color:var(--tx4)">—</span>';
+    return `<tr onclick="apriScheda('${t.id}')">
+      <td><strong>${t.nome}</strong></td>
+      <td>${t.regione||'—'}</td>
+      <td>${t.provincia||'—'}</td>
+      <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
+      <td>${t.partite_iva?.toLocaleString('it-IT')||'—'}</td>
+      <td>${fasiHtml}</td>
+      <td onclick="event.stopPropagation()">
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-icon" onclick="openModalTerritorio('${t.id}')" title="Modifica">
+            <svg viewBox="0 0 16 16"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>
+          </button>
+          <button class="btn btn-sm btn-icon" style="color:var(--red)" onclick="eliminaTerritorio('${t.id}')" title="Elimina">
+            <svg viewBox="0 0 16 16"><path d="M3 4h10M5 4V3h6v1M6 7v5M10 7v5M4 4l1 9h6l1-9"/></svg>
+          </button>
         </div>
-        <span class="ass-stato ass-s-${a.stato}">${statoLabel}</span>
-        <span style="color:var(--tx3);font-size:16px;margin-left:8px">›</span>
-      </div>
-      <div class="ass-body" style="display:none">
-        <div class="ass-field"><div class="ass-label">Tipo evento</div><div class="ass-value">${a.tipo_evento||'—'}</div></div>
-        <div class="ass-field"><div class="ass-label">Range d'età</div><div class="ass-value">${a.range_eta||'—'}</div></div>
-        <div class="ass-field"><div class="ass-label">Data patrocinio</div><div class="ass-value">${a.data_patrocinio?new Date(a.data_patrocinio).toLocaleDateString('it-IT'):'—'}</div></div>
-        <div class="ass-field"><div class="ass-label">Data evento</div><div class="ass-value">${a.data_evento?new Date(a.data_evento).toLocaleDateString('it-IT'):'—'}</div></div>
-        <div class="ass-field"><div class="ass-label">Dicitura comune</div><div class="ass-value">${a.dicitura_comune||'—'}</div></div>
-        <div class="ass-field"><div class="ass-label">Inserire</div><div class="ass-value">${a.inserire||'—'}</div></div>
-        ${a.note?`<div class="ass-field" style="grid-column:1/-1"><div class="ass-label">Note</div><div class="ass-value">${a.note}</div></div>`:''}
-      </div>
-      <div class="ass-foot" style="display:none">
-        <span class="mod-badge mod-${a.modalita||'patrocinio'}">${mod}</span>
-        <div style="flex:1"></div>
-        <button class="btn btns" style="font-size:10px;padding:3px 8px" onclick="cambiaStatoAss('${a.id}','${a.stato}')">Cambia stato</button>
-        <button class="btn btns" style="font-size:10px;padding:3px 8px;color:#dc2626" onclick="eliminaAss('${a.id}')">✕</button>
-      </div>
-    </div>`;
+      </td>
+    </tr>`;
   }).join('');
 }
 
-function toggleAssCard(head){
-  const body=head.nextElementSibling;
-  const foot=body.nextElementSibling;
-  const arrow=head.querySelector('span:last-child');
-  const open=body.style.display!=='none';
-  body.style.display=open?'none':'grid';
-  foot.style.display=open?'none':'flex';
-  arrow.textContent=open?'›':'⌄';
+function filterTerritori() { renderTerritori(); }
+
+async function salvaTerritorioForm() {
+  const nome = document.getElementById('tNome').value.trim();
+  if (!nome) { toast('Il nome è obbligatorio', 'error'); return; }
+  const btn = document.getElementById('btnSalvaTerritorio');
+  btn.textContent = 'Salvo...'; btn.disabled = true;
+  const payload = {
+    nome,
+    regione: document.getElementById('tRegione').value.trim() || null,
+    provincia: document.getElementById('tProvincia').value.trim() || null,
+    abitanti: parseInt(document.getElementById('tAbitanti').value) || null,
+    partite_iva: parseInt(document.getElementById('tPartiteIva').value) || null,
+    note: document.getElementById('tNote').value.trim() || null,
+    creato_da: user?.id,
+  };
+  if (editTerrId) {
+    const { error } = await sb.from('territori').update(payload).eq('id', editTerrId);
+    if (error) { toast('Errore: '+error.message, 'error'); btn.textContent='Salva territorio'; btn.disabled=false; return; }
+    toast('Territorio aggiornato', 'success');
+  } else {
+    const { error } = await sb.from('territori').insert(payload);
+    if (error) { toast('Errore: '+error.message, 'error'); btn.textContent='Salva territorio'; btn.disabled=false; return; }
+    toast('Territorio aggiunto', 'success');
+  }
+  btn.textContent = 'Salva territorio'; btn.disabled = false;
+  closeModal('modalTerritorio');
+  await loadTerritori();
+  loadDashboard();
 }
 
-async function cambiaStatoAss(id,statoAttuale){
-  const stati=['bozza','confermata','in_lavorazione','completata'];
-  const labels={bozza:'Bozza',confermata:'Confermata',in_lavorazione:'In lavorazione',completata:'Completata'};
-  const prossimo=stati[(stati.indexOf(statoAttuale)+1)%stati.length];
-  if(!confirm(`Cambiare stato a "${labels[prossimo]}"?`))return;
-  await sb.from('assegnazioni').update({stato:prossimo}).eq('id',id);
-  toast(`Stato: ${labels[prossimo]}`,'success');
-  await loadAssegnazioni();
+async function eliminaTerritorio(id) {
+  if (!confirm('Eliminare questo territorio? Verranno eliminate anche le sue fasi pipeline.')) return;
+  await sb.from('territori').delete().eq('id', id);
+  toast('Eliminato', 'success');
+  await loadTerritori();
+  loadDashboard();
 }
 
-async function eliminaAss(id){
-  if(!confirm('Eliminare questa assegnazione?'))return;
-  await sb.from('assegnazioni').delete().eq('id',id);
-  toast('Eliminata','success');
-  await loadAssegnazioni();
-}
-
-async function apriStorico(territorioId){
-  const t=allT.find(x=>x.id===territorioId);
-  if(!t)return;
-  closeM('mAssegnazione');
-  await apriScheda(territorioId);
-}
-
-// ─── PIPELINE ────────────────────────────────────────
-const FASI = [
-  { id:'da_contattare',    label:'Da contattare',       color:'#94a3b8', bg:'#f1f5f9' },
-  { id:'contattato',       label:'Contattato',          color:'#f59e0b', bg:'#fef3c7' },
-  { id:'patrocinio_concesso',   label:'Patrocinio concesso',  color:'#10b981', bg:'#d1fae5' },
-  { id:'patrocinio_negato',     label:'Patrocinio negato',    color:'#ef4444', bg:'#fee2e2' },
-  { id:'suolo_pubblico_richiesto', label:'Suolo pubblico',    color:'#8b5cf6', bg:'#ede9fe' },
-  { id:'location_selezionata',  label:'Location selezionata', color:'#26ADE4', bg:'#e8f6fc' },
-];
-
-let pipelineData = []; // tutti i record pipeline
-let pipelineEditId = null; // ID record pipeline in modifica
-
+// ── PIPELINE ──
 async function loadPipeline() {
-  // Popola filtro regioni
-  const regSel = document.getElementById('plFilterReg');
-  if (regSel.options.length < 2) {
-    [...new Set(allT.map(t=>t.regione).filter(Boolean))].sort()
-      .forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; regSel.appendChild(o); });
-  }
-  // Popola anni
-  const annoSel = document.getElementById('plFilterAnno');
-  if (annoSel.options.length < 2) {
-    const curr = new Date().getFullYear();
-    [curr-1,curr,curr+1].forEach(y => { const o=document.createElement('option'); o.value=y; o.textContent=y; annoSel.appendChild(o); });
-  }
-
-  const regFilt = regSel.value;
-  const annoFilt = parseInt(annoSel.value) || null;
-  const q = document.getElementById('plSearch').value.toLowerCase();
-
-  // Carica tutti i record pipeline attivi
-  let query = sb.from('pipeline_territorio')
-    .select('*, territori(id,comune,provincia,regione)')
-    .eq('attivo', true)
-    .order('created_at', { ascending: false });
-  if (annoFilt) query = query.gte('data_fase', `${annoFilt}-01-01`).lte('data_fase', `${annoFilt}-12-31`);
-
-  const { data } = await query;
-  pipelineData = data || [];
-
-  // Filtra
-  let filtered = pipelineData;
-  if (regFilt) filtered = filtered.filter(p => p.territori?.regione === regFilt);
-  if (q) filtered = filtered.filter(p => (p.territori?.comune||'').toLowerCase().includes(q) || (p.territori?.provincia||'').toLowerCase().includes(q));
-
-  // Raggruppa per territorio — un comune può avere più fasi attive
-  const byTerr = {};
-  filtered.forEach(p => {
-    const tid = p.territorio_id;
-    if (!byTerr[tid]) byTerr[tid] = { territorio: p.territori, fasi: [] };
-    byTerr[tid].fasi.push(p);
-  });
-
-  // Raggruppa per fase (usa la fase più recente di ogni territorio per il Kanban)
+  const q = document.getElementById('plSearch')?.value.toLowerCase() || '';
+  const reg = document.getElementById('plRegione')?.value || '';
+  const { data } = await sb.from('pipeline').select('*, territori(id,nome,regione,provincia)').order('created_at', {ascending:false});
+  allPipeline = data || [];
+  // Filter
+  let filtered = allPipeline;
+  if (reg) filtered = filtered.filter(p => p.territori?.regione === reg);
+  if (q) filtered = filtered.filter(p => (p.territori?.nome||'').toLowerCase().includes(q) || (p.territori?.provincia||'').toLowerCase().includes(q));
+  // Group by fase
   const byFase = {};
-  FASI.forEach(f => { byFase[f.id] = []; });
-
-  Object.values(byTerr).forEach(item => {
-    // Se ha più fasi attive, mostralo in tutte
-    item.fasi.forEach(p => {
-      if (byFase[p.fase]) byFase[p.fase].push({ ...item, currentFase: p });
-    });
-  });
-
+  Object.keys(FASI).forEach(f => { byFase[f] = []; });
+  filtered.forEach(p => { if (byFase[p.fase]) byFase[p.fase].push(p); });
   renderKanban(byFase);
+  renderTerritori(); // Refresh badges
 }
 
 function renderKanban(byFase) {
-  const board = document.getElementById('pipelineKanban');
-  board.innerHTML = `<div class="kanban-board">${
-    FASI.map(f => {
-      const items = byFase[f.id] || [];
-      return `<div class="kanban-col">
-        <div class="kanban-head">
-          <div class="kanban-label">
-            <div class="kanban-dot" style="background:${f.color}"></div>
-            ${f.label}
-          </div>
-          <span class="kanban-count">${items.length}</span>
-        </div>
-        <div class="kanban-body">
-          <button onclick="apriModalFase(null,'${f.id}')" style="width:100%;padding:7px;border:1px dashed var(--bd2);border-radius:var(--r);background:none;color:var(--tx3);font-family:var(--f);font-size:11px;cursor:pointer">+ Aggiungi</button>
-          ${items.map(item => {
-            const p = item.currentFase;
-            const t = item.territorio;
-            const altreF = item.fasi.filter(x => x.id !== p.id);
-            return `<div class="kanban-card" onclick="apriSchedaPipeline('${t?.id}','${p.id}')">
-              <div class="kc-comune">${t?.comune||'—'}</div>
-              <div class="kc-prov">${t?.provincia||''} · ${t?.regione||''}</div>
-              ${p.data_fase ? `<div class="kc-date">📅 ${new Date(p.data_fase).toLocaleDateString('it-IT')}</div>` : ''}
-              ${p.note ? `<div class="kc-note">${p.note}</div>` : ''}
-              ${altreF.length ? `<div class="kc-multi">${altreF.map(x => {
-                const ff = FASI.find(f=>f.id===x.fase);
-                return ff ? `<span class="kc-fase-chip" style="background:${ff.bg};color:${ff.color}">${ff.label}</span>` : '';
-              }).join('')}</div>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
-    }).join('')
-  }</div>`;
-}
-
-function apriSchedaPipeline(terrId, pipelineId) {
-  // Prima apri scheda territorio poi mostra modal modifica fase
-  if (terrId) apriScheda(terrId);
-}
-
-async function apriModalFase(terrId = null, fasePredefinita = null, editPipelineId = null) {
-  pipelineEditId = editPipelineId;
-  // Use current scheda territory if no terrId passed
-  if (!terrId && schedaTerritoryId) terrId = schedaTerritoryId;
-
-  // Popola select comuni
-  const sel = document.getElementById('plComuneSel');
-  sel.innerHTML = '<option value="">Seleziona comune...</option>';
-  [...allT].sort((a,b)=>a.comune.localeCompare(b.comune)).forEach(t => {
-    const o = document.createElement('option');
-    o.value = t.id; o.textContent = `${t.comune} (${t.provincia})`;
-    sel.appendChild(o);
-  });
-  if (terrId) sel.value = terrId;
-  sel.disabled = !!terrId;
-
-  // Popola fasi
-  const faseSel = document.getElementById('plFaseSel');
-  faseSel.innerHTML = FASI.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
-  if (fasePredefinita) faseSel.value = fasePredefinita;
-
-  document.getElementById('plData').value = new Date().toISOString().split('T')[0];
-  document.getElementById('plNote').value = '';
-  document.getElementById('plAttivo').checked = true;
-  document.getElementById('mPipelineTitle').textContent = editPipelineId ? 'Modifica fase' : 'Aggiungi fase pipeline';
-  document.getElementById('mPipeline').classList.add('on');
+  const kanban = document.getElementById('kanban');
+  kanban.innerHTML = Object.entries(FASI).map(([faseId, faseInfo]) => {
+    const items = byFase[faseId] || [];
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-dot" style="background:${faseInfo.color}"></div>
+        <div class="kanban-col-title">${faseInfo.label}</div>
+        <div class="kanban-col-count">${items.length}</div>
+      </div>
+      <div class="kanban-col-body">
+        ${items.map(p => `
+          <div class="kanban-card" onclick="apriScheda('${p.territorio_id}')">
+            <div class="kc-name">${p.territori?.nome||'—'}</div>
+            <div class="kc-meta">${p.territori?.provincia||''} · ${p.territori?.regione||''}</div>
+            ${p.data_fase ? `<div class="kc-date"><svg viewBox="0 0 12 12" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.5"><rect x="1" y="2" width="10" height="9" rx="1"/><path d="M1 5h10M4 1v2M8 1v2"/></svg>${new Date(p.data_fase).toLocaleDateString('it-IT')}</div>` : ''}
+            ${p.note ? `<div class="kc-note">${p.note}</div>` : ''}
+          </div>`).join('')}
+        <button class="kanban-add" onclick="openModalFase(null,'${faseId}')">+ Aggiungi</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function salvaFase() {
-  const terrId = document.getElementById('plComuneSel').value;
-  const fase = document.getElementById('plFaseSel').value;
-  if (!terrId || !fase) { toast('Seleziona comune e fase', 'error'); return; }
-
+  const terrId = document.getElementById('fTerritorioId').value;
+  const fase = document.getElementById('fFase').value;
+  if (!terrId || !fase) { toast('Seleziona territorio e fase', 'error'); return; }
   const payload = {
     territorio_id: terrId,
     fase,
-    data_fase: document.getElementById('plData').value || null,
-    note: document.getElementById('plNote').value.trim() || null,
-    attivo: document.getElementById('plAttivo').checked,
+    data_fase: document.getElementById('fData').value || null,
+    note: document.getElementById('fNote').value.trim() || null,
     creato_da: user?.id,
   };
-
-  if (pipelineEditId) {
-    await sb.from('pipeline_territorio').update(payload).eq('id', pipelineEditId);
+  if (editFaseId) {
+    await sb.from('pipeline').update(payload).eq('id', editFaseId);
     toast('Fase aggiornata', 'success');
   } else {
-    await sb.from('pipeline_territorio').insert(payload);
-    toast('Fase aggiunta alla pipeline', 'success');
+    await sb.from('pipeline').insert(payload);
+    toast('Aggiunto alla pipeline', 'success');
   }
-  closeM('mPipeline');
-  if (document.getElementById('mScheda').classList.contains('on') && schedaTerritoryId) {
-    await loadPipelineTerritorio(schedaTerritoryId);
-  }
-  if (document.getElementById('s-pipeline').classList.contains('on')) {
-    await loadPipeline();
-  }
+  closeModal('modalFase');
+  await loadPipeline();
 }
 
 async function eliminaFase(id) {
-  if (!confirm('Rimuovere questa fase dalla pipeline?')) return;
-  await sb.from('pipeline_territorio').delete().eq('id', id);
-  toast('Fase rimossa', 'success');
-  if (document.getElementById('mScheda').classList.contains('on') && schedaTerritoryId) {
-    await loadPipelineTerritorio(schedaTerritoryId);
-  }
-  if (document.getElementById('s-pipeline').classList.contains('on')) {
-    await loadPipeline();
-  }
+  if (!confirm('Rimuovere questa fase?')) return;
+  await sb.from('pipeline').delete().eq('id', id);
+  toast('Rimosso', 'success');
+  await loadPipeline();
 }
 
+// ── DASHBOARD ──
+function loadDashboard() {
+  document.getElementById('statTot').textContent = allTerritori.length;
+  const inPipeline = new Set(allPipeline.map(p=>p.territorio_id)).size;
+  document.getElementById('statPipeline').textContent = inPipeline;
+  const patrocinati = allPipeline.filter(p=>p.fase==='patrocinio_concesso').length;
+  document.getElementById('statPatrocinio').textContent = patrocinati;
+  const regioni = new Set(allTerritori.map(t=>t.regione).filter(Boolean)).size;
+  document.getElementById('statRegioni').textContent = regioni;
+  // Last 8 territories
+  const fasiMap = getFasiPerTerritorio();
+  const tbody = document.getElementById('dashTable');
+  if (!allTerritori.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">Nessun territorio ancora. <button class="btn btn-sm btn-primary" onclick="showView('territori')">Inizia ora →</button></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = [...allTerritori].slice(0,8).map(t => {
+    const fasi = fasiMap[t.id] || [];
+    const fasiHtml = fasi.length
+      ? fasi.slice(0,1).map(f => `<span class="badge ${FASI[f.fase]?.cls||'badge-gray'}" style="font-size:10px">${FASI[f.fase]?.label||f.fase}</span>`).join('')
+      : '<span style="font-size:11px;color:var(--tx4)">—</span>';
+    return `<tr onclick="apriScheda('${t.id}')">
+      <td><strong>${t.nome}</strong></td>
+      <td>${t.regione||'—'}</td>
+      <td>${t.provincia||'—'}</td>
+      <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
+      <td>${fasiHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── SCHEDA TERRITORIO ──
+async function apriScheda(id) {
+  const t = allTerritori.find(x=>x.id===id);
+  if (!t) return;
+  const fasiMap = getFasiPerTerritorio();
+  const fasi = fasiMap[id] || [];
+  document.getElementById('schedaContent').innerHTML = `
+    <div class="scheda-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="scheda-nome">${t.nome}</div>
+          <div class="scheda-meta">${[t.regione,t.provincia].filter(Boolean).join(' · ')}</div>
+        </div>
+        <button class="modal-close" style="color:rgba(255,255,255,.7);background:rgba(255,255,255,.1)" onclick="closeModal('modalScheda')">✕</button>
+      </div>
+    </div>
+    <div class="scheda-body">
+      <div class="scheda-section">
+        <div class="scheda-section-title">Dati anagrafici</div>
+        <div class="scheda-grid">
+          <div class="scheda-field">
+            <div class="scheda-label">Abitanti</div>
+            <div class="scheda-value big">${t.abitanti?.toLocaleString('it-IT')||'—'}</div>
+          </div>
+          <div class="scheda-field">
+            <div class="scheda-label">Partite IVA</div>
+            <div class="scheda-value big">${t.partite_iva?.toLocaleString('it-IT')||'—'}</div>
+          </div>
+          <div class="scheda-field">
+            <div class="scheda-label">Regione</div>
+            <div class="scheda-value">${t.regione||'—'}</div>
+          </div>
+          <div class="scheda-field">
+            <div class="scheda-label">Provincia</div>
+            <div class="scheda-value">${t.provincia||'—'}</div>
+          </div>
+          ${t.note ? `<div class="scheda-field" style="grid-column:1/-1">
+            <div class="scheda-label">Note</div>
+            <div class="scheda-value" style="font-size:13px;font-weight:400;color:var(--tx2)">${t.note}</div>
+          </div>` : ''}
+        </div>
+      </div>
+      <div class="scheda-section">
+        <div class="scheda-section-title">
+          Pipeline contatto
+          <button class="btn btn-sm" onclick="openModalFase('${id}')">+ Aggiungi fase</button>
+        </div>
+        ${fasi.length ? fasi.map(p => `
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
+            <span class="badge ${FASI[p.fase]?.cls||'badge-gray'}">${FASI[p.fase]?.label||p.fase}</span>
+            <div style="flex:1">
+              ${p.data_fase ? `<div style="font-size:11px;color:var(--tx3)">📅 ${new Date(p.data_fase).toLocaleDateString('it-IT')}</div>` : ''}
+              ${p.note ? `<div style="font-size:12px;color:var(--tx2);margin-top:2px">${p.note}</div>` : ''}
+            </div>
+            <button onclick="eliminaFase('${p.id}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0">✕</button>
+          </div>`).join('')
+        : '<div style="font-size:13px;color:var(--tx3);padding:8px 0">Nessuna fase — aggiungi la prima</div>'}
+      </div>
+      <div style="padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="openModalTerritorio('${id}');closeModal('modalScheda')">✏️ Modifica territorio</button>
+        <button class="btn" style="color:var(--red)" onclick="eliminaTerritorio('${id}');closeModal('modalScheda')">🗑️ Elimina</button>
+      </div>
+    </div>`;
+  openModal('modalScheda');
+}
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openModalTerritorio(id = null) {
+  editTerrId = id;
+  document.getElementById('modalTerritorioTitle').textContent = id ? 'Modifica territorio' : 'Nuovo territorio';
+  if (id) {
+    const t = allTerritori.find(x=>x.id===id);
+    document.getElementById('tNome').value = t?.nome || '';
+    document.getElementById('tRegione').value = t?.regione || '';
+    document.getElementById('tProvincia').value = t?.provincia || '';
+    document.getElementById('tAbitanti').value = t?.abitanti || '';
+    document.getElementById('tPartiteIva').value = t?.partite_iva || '';
+    document.getElementById('tNote').value = t?.note || '';
+  } else {
+    ['tNome','tRegione','tProvincia','tAbitanti','tPartiteIva','tNote'].forEach(f => document.getElementById(f).value = '');
+  }
+  openModal('modalTerritorio');
+}
+
+function openModalFase(terrId = null, fase = null) {
+  editFaseId = null;
+  // Populate territorio select
+  const sel = document.getElementById('fTerritorioId');
+  sel.innerHTML = '<option value="">Seleziona territorio...</option>';
+  [...allTerritori].sort((a,b)=>a.nome.localeCompare(b.nome)).forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = `${t.nome}${t.provincia?' ('+t.provincia+')':''}`;
+    if (t.id === terrId) o.selected = true;
+    sel.appendChild(o);
+  });
+  if (fase) document.getElementById('fFase').value = fase;
+  document.getElementById('fData').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fNote').value = '';
+  document.getElementById('modalFaseTitle').textContent = 'Aggiungi alla pipeline';
+  openModal('modalFase');
+}
+
+// ── TOAST ──
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'');
+  t.style.display = 'block';
+  requestAnimationFrame(() => t.classList.add('show'));
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.classList.remove('show'); setTimeout(()=>t.style.display='none',200); }, 3000);
+}
+
+// ── EVENTS ──
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+document.addEventListener('click', e => { if(!e.target.closest('.tb-user')) document.getElementById('uMenu').classList.remove('on'); });
+
+// ── INIT ──
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
