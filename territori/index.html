@@ -186,6 +186,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
 /* ── PIPELINE FASE LABELS ── */
 .fase-da_contattare{background:#f1f5f9;color:#475569}
 .fase-contattato{background:var(--yellowl);color:#92400e}
+.fase-attesa_patrocinio{background:#e0e7ff;color:#4338ca}
 .fase-patrocinio_concesso{background:var(--greenl);color:#065f46}
 .fase-patrocinio_negato{background:var(--redl);color:#991b1b}
 .fase-suolo_pubblico{background:var(--purplel);color:#5b21b6}
@@ -345,7 +346,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
           </div>
           <div class="table-wrap" style="border:none;border-radius:0;box-shadow:none">
             <table class="table">
-              <thead><tr><th>Territorio</th><th>Regione</th><th>Provincia</th><th>Abitanti</th></tr></thead>
+              <thead><tr><th>Territorio</th><th>Regione</th><th>Provincia</th><th>Partite IVA</th></tr></thead>
               <tbody id="dashTable"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--tx3)">Caricamento...</td></tr></tbody>
             </table>
           </div>
@@ -371,6 +372,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
                 <th>Provincia</th>
                 <th>Abitanti</th>
                 <th>P.IVA</th>
+                <th>Budget storico</th>
                 <th>Pipeline</th>
                 <th></th>
               </tr>
@@ -504,6 +506,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
         <select class="fs" id="fFase">
           <option value="da_contattare">Da contattare</option>
           <option value="contattato">Contattato</option>
+          <option value="attesa_patrocinio">Attesa patrocinio</option>
           <option value="patrocinio_concesso">Patrocinio concesso</option>
           <option value="patrocinio_negato">Patrocinio negato</option>
           <option value="suolo_pubblico">Suolo pubblico</option>
@@ -522,6 +525,37 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modalFase')">Annulla</button>
       <button class="btn btn-primary" onclick="salvaFase()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL BUDGET ══ -->
+<div class="overlay" id="modalBudget">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Aggiungi budget</div>
+      <button class="modal-close" onclick="closeModal('modalBudget')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fgrid">
+        <div class="fg">
+          <div class="fl">Anno *</div>
+          <input class="fi" id="bAnno" type="number" placeholder="Es. 2024" min="2000" max="2100"/>
+        </div>
+        <div class="fg">
+          <div class="fl">Importo € *</div>
+          <input class="fi" id="bImporto" type="number" placeholder="Es. 15000" min="0" step="100"/>
+        </div>
+        <div class="fg full">
+          <div class="fl">Note</div>
+          <input class="fi" id="bNota" placeholder="Note opzionali..."/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modalBudget')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaBudget()">Salva budget</button>
     </div>
   </div>
 </div>
@@ -598,6 +632,7 @@ let currentView = 'dashboard';
 const FASI = {
   da_contattare:   { label: 'Da contattare',      color: '#64748b', bg: '#f1f5f9', cls: 'fase-da_contattare' },
   contattato:      { label: 'Contattato',          color: '#f59e0b', bg: '#fef3c7', cls: 'fase-contattato' },
+  attesa_patrocinio: { label: 'Attesa patrocinio',  color: '#6366f1', bg: '#e0e7ff', cls: 'fase-attesa_patrocinio' },
   patrocinio_concesso: { label: 'Patrocinio ✓',   color: '#10b981', bg: '#d1fae5', cls: 'fase-patrocinio_concesso' },
   patrocinio_negato:   { label: 'Patrocinio ✗',   color: '#ef4444', bg: '#fee2e2', cls: 'fase-patrocinio_negato' },
   suolo_pubblico:  { label: 'Suolo pubblico',      color: '#8b5cf6', bg: '#ede9fe', cls: 'fase-suolo_pubblico' },
@@ -614,7 +649,7 @@ async function init(u) {
   document.getElementById('topName').textContent = nome;
   const ruoloLabels = { superadmin:'Super Admin', admin:'Admin', operatore:'Operatore', visualizzatore:'Visualizzatore' };
   document.getElementById('sideRole').textContent = ruoloLabels[profilo?.ruolo] || profilo?.ruolo || '';
-  await Promise.all([loadTerritori(), loadPipeline(), loadProfili()]);
+  await Promise.all([loadTerritori(), loadPipeline(), loadProfili(), loadBudgetPerTabella()]);
   // Populate anni for assegnazioni filter
   const annoSel = document.getElementById('assAnno');
   if (annoSel) {
@@ -722,12 +757,15 @@ function renderTerritori() {
     const fasiHtml = fasi.length
       ? fasi.slice(0,2).map(f => `<span class="badge ${FASI[f.fase]?.cls||'badge-gray'}" style="font-size:10px">${FASI[f.fase]?.label||f.fase}</span>`).join(' ') + (fasi.length>2?` <span style="font-size:10px;color:var(--tx3)">+${fasi.length-2}</span>`:'')
       : '<span style="font-size:11px;color:var(--tx4)">—</span>';
+    const bs = budgetSummary[t.id];
+    const budgetHtml = bs ? `<span style="font-size:12px;font-weight:600;color:var(--tx)">€ ${bs.tot.toLocaleString('it-IT')}</span> <span style="font-size:10px;color:var(--tx3)">(${bs.count} ed.)</span>` : '<span style="color:var(--tx4);font-size:12px">—</span>';
     return `<tr onclick="apriScheda('${t.id}')">
       <td><strong>${t.nome}</strong></td>
       <td>${t.regione||'—'}</td>
       <td>${t.provincia||'—'}</td>
       <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
       <td>${t.partite_iva?.toLocaleString('it-IT')||'—'}</td>
+      <td>${budgetHtml}</td>
       <td>${fasiHtml}</td>
       <td onclick="event.stopPropagation()">
         <div style="display:flex;gap:4px">
@@ -890,7 +928,7 @@ function loadDashboard() {
       <td><strong>${t.nome}</strong></td>
       <td>${t.regione||'—'}</td>
       <td>${t.provincia||'—'}</td>
-      <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
+      <td>${t.partite_iva?.toLocaleString('it-IT')||'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -953,6 +991,15 @@ async function apriScheda(id) {
           </div>`).join('')
         : '<div style="font-size:13px;color:var(--tx3);padding:8px 0">Nessuna fase — aggiungi la prima</div>'}
       </div>
+      <div class="scheda-section">
+        <div class="scheda-section-title">
+          Budget edizioni precedenti
+          <button class="btn btn-sm" onclick="openModalBudget('${id}')">+ Aggiungi</button>
+        </div>
+        <div id="schedaBudget-${id}">
+          <div style="font-size:13px;color:var(--tx3)">Caricamento...</div>
+        </div>
+      </div>
       <div style="padding:14px 20px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="openModalEdizione(null,'${id}');closeModal('modalScheda')">+ Crea edizione</button>
         <button class="btn" onclick="openModalTerritorio('${id}');closeModal('modalScheda')">✏️ Modifica</button>
@@ -960,6 +1007,8 @@ async function apriScheda(id) {
       </div>
     </div>`;
   openModal('modalScheda');
+  // Load budget after modal opens
+  setTimeout(() => loadBudgetTerritorio(id), 50);
 }
 
 // ── MODALS ──
@@ -1223,6 +1272,87 @@ async function onDrop(e, newFase) {
 }
 
 // VIEW_CONFIG already includes assegnazioni above
+
+// ── BUDGET EDIZIONI ──
+let editBudgetId = null;
+let budgetTerrId = null;
+let allBudgets = {}; // cache: terrId -> [{anno, importo}]
+
+async function loadBudgetTerritorio(terrId) {
+  const { data } = await sb.from('budget_edizioni')
+    .select('*').eq('territorio_id', terrId)
+    .order('anno', { ascending: false });
+  allBudgets[terrId] = data || [];
+  renderBudgetScheda(terrId);
+  return data || [];
+}
+
+function renderBudgetScheda(terrId) {
+  const div = document.getElementById(`schedaBudget-${terrId}`);
+  if (!div) return;
+  const budgets = allBudgets[terrId] || [];
+  if (!budgets.length) {
+    div.innerHTML = '<div style="font-size:13px;color:var(--tx3)">Nessun budget registrato</div>';
+    return;
+  }
+  const max = Math.max(...budgets.map(b => b.importo));
+  div.innerHTML = budgets.map(b => `
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:13px;font-weight:700;color:var(--tx);width:44px">${b.anno}</span>
+      <div style="flex:1;height:6px;background:var(--sur2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${max>0?Math.round((b.importo/max)*100):0}%;background:var(--wc);border-radius:3px"></div>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:var(--tx);min-width:100px;text-align:right">€ ${Number(b.importo).toLocaleString('it-IT')}</span>
+      <button onclick="eliminaBudget('${b.id}','${terrId}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0">✕</button>
+    </div>`).join('') + '<div style="height:4px"></div>';
+}
+
+function openModalBudget(terrId) {
+  budgetTerrId = terrId;
+  editBudgetId = null;
+  document.getElementById('bAnno').value = new Date().getFullYear() - 1;
+  document.getElementById('bImporto').value = '';
+  document.getElementById('bNota').value = '';
+  openModal('modalBudget');
+}
+
+async function salvaBudget() {
+  const anno = parseInt(document.getElementById('bAnno').value);
+  const importo = parseFloat(document.getElementById('bImporto').value);
+  if (!anno || isNaN(importo) || importo < 0) { toast('Anno e importo obbligatori', 'error'); return; }
+  const payload = {
+    territorio_id: budgetTerrId,
+    anno, importo,
+    note: document.getElementById('bNota').value.trim() || null,
+  };
+  const { error } = await sb.from('budget_edizioni').insert(payload);
+  if (error) { toast('Errore: ' + error.message, 'error'); return; }
+  toast('Budget aggiunto', 'success');
+  closeModal('modalBudget');
+  await loadBudgetTerritorio(budgetTerrId);
+  await loadBudgetPerTabella();
+}
+
+async function eliminaBudget(id, terrId) {
+  if (!confirm('Eliminare questo budget?')) return;
+  await sb.from('budget_edizioni').delete().eq('id', id);
+  toast('Eliminato', 'success');
+  await loadBudgetTerritorio(terrId);
+  await loadBudgetPerTabella();
+}
+
+// Carica budget per tutti i territori (per colonna tabella)
+let budgetSummary = {}; // terrId -> totale o ultimo anno
+async function loadBudgetPerTabella() {
+  const { data } = await sb.from('budget_edizioni').select('territorio_id, anno, importo').order('anno', { ascending: false });
+  budgetSummary = {};
+  (data || []).forEach(b => {
+    if (!budgetSummary[b.territorio_id]) budgetSummary[b.territorio_id] = { tot: 0, count: 0, lastAnno: b.anno, lastImporto: b.importo };
+    budgetSummary[b.territorio_id].tot += b.importo;
+    budgetSummary[b.territorio_id].count++;
+  });
+  renderTerritori();
+}
 
 // ── INIT ──
 (async () => {
