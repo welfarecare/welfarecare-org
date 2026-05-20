@@ -356,9 +356,17 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
       <!-- ── TERRITORI ── -->
       <div class="view" id="view-territori">
         <div class="toolbar">
-          <input class="fi" style="max-width:240px;margin:0;font-size:13px" placeholder="Cerca territorio..." id="terrSearch" oninput="filterTerritori()"/>
-          <select class="fs" style="max-width:160px" id="terrRegione" onchange="filterTerritori()">
-            <option value="">Tutte le regioni</option>
+          <input class="fi" style="max-width:200px;margin:0;font-size:13px" placeholder="Cerca territorio..." id="terrSearch" oninput="filterTerritori()"/>
+          <select class="fs" style="max-width:140px" id="terrProvincia" onchange="filterTerritori()">
+            <option value="">Tutte le province</option>
+          </select>
+          <select class="fs" style="max-width:160px" id="terrSort" onchange="filterTerritori()">
+            <option value="nome_asc">Nome A→Z</option>
+            <option value="nome_desc">Nome Z→A</option>
+            <option value="piva_desc">P.IVA ↓</option>
+            <option value="piva_asc">P.IVA ↑</option>
+            <option value="budget_desc">Budget ↓</option>
+            <option value="budget_asc">Budget ↑</option>
           </select>
           <div class="toolbar-sp"></div>
           <span style="font-size:12px;color:var(--tx3)" id="terrCount"></span>
@@ -367,18 +375,17 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
           <table class="table">
             <thead>
               <tr>
-                <th>Territorio</th>
-                <th>Regione</th>
+                <th onclick="setSort('nome')" style="cursor:pointer;user-select:none">Territorio <span id="sortNome">↕</span></th>
                 <th>Provincia</th>
                 <th>Abitanti</th>
-                <th>P.IVA</th>
-                <th>Budget storico</th>
+                <th onclick="setSort('piva')" style="cursor:pointer;user-select:none">P.IVA <span id="sortPiva">↕</span></th>
+                <th onclick="setSort('budget')" style="cursor:pointer;user-select:none">Budget storico <span id="sortBudget">↕</span></th>
                 <th>Pipeline</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="terrTable">
-              <tr><td colspan="7" style="text-align:center;padding:48px;color:var(--tx3)">Caricamento...</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:48px;color:var(--tx3)">Caricamento...</td></tr>
             </tbody>
           </table>
         </div>
@@ -707,16 +714,24 @@ function handleSearch(q) {
 async function loadTerritori() {
   const { data } = await sb.from('territori').select('*').order('nome');
   allTerritori = data || [];
-  // Populate regione filter
+  // Populate provincia filter
+  const province = [...new Set(allTerritori.map(t=>t.provincia).filter(Boolean))].sort();
+  const provSel = document.getElementById('terrProvincia');
+  if (provSel) {
+    const curr = provSel.value;
+    provSel.innerHTML = '<option value="">Tutte le province</option>';
+    province.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; provSel.appendChild(o); });
+    provSel.value = curr;
+  }
+  // Populate regione filter for pipeline
   const regioni = [...new Set(allTerritori.map(t=>t.regione).filter(Boolean))].sort();
-  ['terrRegione','plRegione'].forEach(selId => {
-    const sel = document.getElementById(selId);
-    if (!sel) return;
-    const curr = sel.value;
-    sel.innerHTML = '<option value="">Tutte le regioni</option>';
-    regioni.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
-    sel.value = curr;
-  });
+  const plRegSel = document.getElementById('plRegione');
+  if (plRegSel) {
+    const curr = plRegSel.value;
+    plRegSel.innerHTML = '<option value="">Tutte le regioni</option>';
+    regioni.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; plRegSel.appendChild(o); });
+    plRegSel.value = curr;
+  }
   document.getElementById('badgeTerritori').textContent = allTerritori.length;
   renderTerritori();
 }
@@ -730,14 +745,45 @@ function getFasiPerTerritorio() {
   return map;
 }
 
+function setSort(field) {
+  const sel = document.getElementById('terrSort');
+  if (!sel) return;
+  const curr = sel.value;
+  // Toggle direction
+  if (curr === field+'_asc') sel.value = field+'_desc';
+  else sel.value = field+'_asc';
+  // Update arrows
+  ['nome','piva','budget'].forEach(f => {
+    const el = document.getElementById('sort'+f.charAt(0).toUpperCase()+f.slice(1));
+    if (el) el.textContent = '↕';
+  });
+  const dir = sel.value.endsWith('_asc') ? '↑' : '↓';
+  const arrow = document.getElementById('sort'+field.charAt(0).toUpperCase()+field.slice(1));
+  if (arrow) arrow.textContent = dir;
+  filterTerritori();
+}
+
 function renderTerritori() {
   const q = document.getElementById('terrSearch')?.value.toLowerCase() || '';
-  const reg = document.getElementById('terrRegione')?.value || '';
+  const prov = document.getElementById('terrProvincia')?.value || '';
+  const sort = document.getElementById('terrSort')?.value || 'nome_asc';
   const fasiMap = getFasiPerTerritorio();
-  const filtered = allTerritori.filter(t => {
-    if (reg && t.regione !== reg) return false;
-    if (q && !t.nome?.toLowerCase().includes(q) && !t.provincia?.toLowerCase().includes(q) && !t.regione?.toLowerCase().includes(q)) return false;
+  let filtered = allTerritori.filter(t => {
+    if (prov && t.provincia !== prov) return false;
+    if (q && !t.nome?.toLowerCase().includes(q) && !t.provincia?.toLowerCase().includes(q)) return false;
     return true;
+  });
+  // Sort
+  filtered.sort((a, b) => {
+    switch(sort) {
+      case 'nome_asc': return (a.nome||'').localeCompare(b.nome||'');
+      case 'nome_desc': return (b.nome||'').localeCompare(a.nome||'');
+      case 'piva_desc': return (b.partite_iva||0) - (a.partite_iva||0);
+      case 'piva_asc': return (a.partite_iva||0) - (b.partite_iva||0);
+      case 'budget_desc': return (budgetSummary[b.id]?.tot||0) - (budgetSummary[a.id]?.tot||0);
+      case 'budget_asc': return (budgetSummary[a.id]?.tot||0) - (budgetSummary[b.id]?.tot||0);
+      default: return (a.nome||'').localeCompare(b.nome||'');
+    }
   });
   document.getElementById('terrCount').textContent = `${filtered.length} territori`;
   const tbody = document.getElementById('terrTable');
@@ -761,7 +807,6 @@ function renderTerritori() {
     const budgetHtml = bs ? `<span style="font-size:12px;font-weight:600;color:var(--tx)">€ ${bs.tot.toLocaleString('it-IT')}</span> <span style="font-size:10px;color:var(--tx3)">(${bs.count} ed.)</span>` : '<span style="color:var(--tx4);font-size:12px">—</span>';
     return `<tr onclick="apriScheda('${t.id}')">
       <td><strong>${t.nome}</strong></td>
-      <td>${t.regione||'—'}</td>
       <td>${t.provincia||'—'}</td>
       <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
       <td>${t.partite_iva?.toLocaleString('it-IT')||'—'}</td>
