@@ -736,7 +736,6 @@ async function loadTerritori() {
     provSel.value = curr;
   }
   // Populate regione filter for pipeline
-  const regioni = [...new Set(allTerritori.map(t=>t.regione).filter(Boolean))].sort();
   const plRegSel = document.getElementById('plRegione');
   if (plRegSel) {
     const curr = plRegSel.value;
@@ -990,8 +989,8 @@ function loadDashboard() {
   document.getElementById('statPipeline').textContent = inPipeline;
   const patrocinati = allPipeline.filter(p=>p.fase==='patrocinio_concesso').length;
   document.getElementById('statPatrocinio').textContent = patrocinati;
-  const regioni = new Set(allTerritori.map(t=>t.regione).filter(Boolean)).size;
-  document.getElementById('statRegioni').textContent = regioni;
+  const regioniCount = new Set(allTerritori.map(t=>t.regione).filter(Boolean)).size;
+  document.getElementById('statRegioni').textContent = regioniCount;
   // Last 8 territories
   const tbody = document.getElementById('dashTable');
   if (!allTerritori.length) {
