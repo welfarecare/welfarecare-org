@@ -720,7 +720,7 @@ async function loadTerritori() {
   if (provSel) {
     const curr = provSel.value;
     provSel.innerHTML = '<option value="">Tutte le province</option>';
-    province.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; provSel.appendChild(o); });
+    province.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p.charAt(0)+p.slice(1).toLowerCase(); provSel.appendChild(o); });
     provSel.value = curr;
   }
   // Populate regione filter for pipeline
@@ -807,7 +807,7 @@ function renderTerritori() {
     const budgetHtml = bs ? `<span style="font-size:12px;font-weight:600;color:var(--tx)">€ ${bs.tot.toLocaleString('it-IT')}</span> <span style="font-size:10px;color:var(--tx3)">(${bs.count} ed.)</span>` : '<span style="color:var(--tx4);font-size:12px">—</span>';
     return `<tr onclick="apriScheda('${t.id}')">
       <td><strong>${t.nome}</strong></td>
-      <td>${t.provincia||'—'}</td>
+      <td>${t.provincia?t.provincia.charAt(0)+t.provincia.slice(1).toLowerCase():'—'}</td>
       <td>${t.abitanti?.toLocaleString('it-IT')||'—'}</td>
       <td>${t.partite_iva?.toLocaleString('it-IT')||'—'}</td>
       <td>${budgetHtml}</td>
@@ -990,7 +990,7 @@ async function apriScheda(id) {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
         <div>
           <div class="scheda-nome">${t.nome}</div>
-          <div class="scheda-meta">${[t.regione,t.provincia].filter(Boolean).join(' · ')}</div>
+          <div class="scheda-meta">${[t.regione,t.provincia?t.provincia.charAt(0)+t.provincia.slice(1).toLowerCase():null].filter(Boolean).join(' · ')}</div>
         </div>
         <button class="modal-close" style="color:rgba(255,255,255,.7);background:rgba(255,255,255,.1)" onclick="closeModal('modalScheda')">✕</button>
       </div>
