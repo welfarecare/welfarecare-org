@@ -524,7 +524,7 @@ html,body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:1
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modalFase')">Annulla</button>
-      <button class="btn btn-primary" onclick="salvaFase()">Salva</button>
+      <button class="btn btn-primary" id="btnSalvaFase" onclick="salvaFase()">Salva</button>
     </div>
   </div>
 </div>
@@ -868,7 +868,8 @@ function renderKanban(byFase) {
                 ${p.note ? `<div class="kc-note">${p.note}</div>` : ''}
               </div>
               <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
-                <button onclick="event.stopPropagation();apriScheda('${p.territorio_id}')" style="background:none;border:none;cursor:pointer;color:var(--tx3);padding:2px;font-size:12px" title="Scheda">👁</button>
+                <button onclick="event.stopPropagation();apriScheda('${p.territorio_id}')" style="background:none;border:none;cursor:pointer;color:var(--tx3);padding:2px;font-size:14px" title="Scheda">👁</button>
+                <button onclick="event.stopPropagation();openModalFase('${p.territorio_id}',null,'${p.id}')" style="background:none;border:1px solid var(--bd2);cursor:pointer;color:var(--tx2);padding:2px 5px;font-size:9px;border-radius:5px;font-family:var(--f);font-weight:600" title="Modifica fase">✏️</button>
                 <button onclick="event.stopPropagation();openModalEdizione(null,'${p.territorio_id}')" style="background:none;border:1px solid var(--bd2);cursor:pointer;color:var(--wcd);padding:2px 5px;font-size:9px;border-radius:5px;font-family:var(--f);font-weight:600;white-space:nowrap" title="Crea edizione">Assegna</button>
               </div>
             </div>
@@ -987,6 +988,7 @@ async function apriScheda(id) {
               ${p.data_fase ? `<div style="font-size:11px;color:var(--tx3)">📅 ${new Date(p.data_fase).toLocaleDateString('it-IT')}</div>` : ''}
               ${p.note ? `<div style="font-size:12px;color:var(--tx2);margin-top:2px">${p.note}</div>` : ''}
             </div>
+            <button onclick="openModalFase('${t.id}',null,'${p.id}')" style="background:none;border:1px solid var(--bd2);color:var(--tx2);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px;font-family:var(--f);flex-shrink:0">✏️</button>
             <button onclick="eliminaFase('${p.id}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;flex-shrink:0">✕</button>
           </div>`).join('')
         : '<div style="font-size:13px;color:var(--tx3);padding:8px 0">Nessuna fase — aggiungi la prima</div>'}
@@ -1013,7 +1015,12 @@ async function apriScheda(id) {
 
 // ── MODALS ──
 function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  // Reset territorio select disabled state
+  const sel = document.getElementById('fTerritorioId');
+  if (sel) sel.disabled = false;
+}
 
 function openModalTerritorio(id = null) {
   editTerrId = id;
@@ -1032,8 +1039,8 @@ function openModalTerritorio(id = null) {
   openModal('modalTerritorio');
 }
 
-function openModalFase(terrId = null, fase = null) {
-  editFaseId = null;
+function openModalFase(terrId = null, fase = null, pipelineId = null) {
+  editFaseId = pipelineId;
   // Populate territorio select
   const sel = document.getElementById('fTerritorioId');
   sel.innerHTML = '<option value="">Seleziona territorio...</option>';
@@ -1043,10 +1050,27 @@ function openModalFase(terrId = null, fase = null) {
     if (t.id === terrId) o.selected = true;
     sel.appendChild(o);
   });
-  if (fase) document.getElementById('fFase').value = fase;
-  document.getElementById('fData').value = new Date().toISOString().split('T')[0];
-  document.getElementById('fNote').value = '';
-  document.getElementById('modalFaseTitle').textContent = 'Aggiungi alla pipeline';
+  if (pipelineId) {
+    // Modalità modifica: carica dati esistenti
+    const existing = allPipeline.find(p => p.id === pipelineId);
+    if (existing) {
+      sel.value = existing.territorio_id;
+      sel.disabled = true;
+      document.getElementById('fFase').value = existing.fase;
+      document.getElementById('fData').value = existing.data_fase || '';
+      document.getElementById('fNote').value = existing.note || '';
+    }
+    document.getElementById('modalFaseTitle').textContent = 'Modifica fase pipeline';
+    document.getElementById('btnSalvaFase').textContent = 'Salva modifiche';
+  } else {
+    sel.disabled = false;
+    if (fase) document.getElementById('fFase').value = fase;
+    else document.getElementById('fFase').value = 'da_contattare';
+    document.getElementById('fData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fNote').value = '';
+    document.getElementById('modalFaseTitle').textContent = 'Aggiungi alla pipeline';
+    document.getElementById('btnSalvaFase').textContent = 'Salva';
+  }
   openModal('modalFase');
 }
 
